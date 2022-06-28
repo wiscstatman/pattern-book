@@ -141,6 +141,21 @@ Try this with 1-count, so that both hands pass when you are the feeder.
 
 Pulsar dates to 1993 by Steve Otteson and MAJ.
 
+### Shifty-Eyed Scoundrel
+
+This pattern was developed while attempting to create a pattern that maximizes the number of throws to return all clubs back to their starting positions ("colors").  Unfortunately this endeavor was unsuccessful, but this challenging triangle pattern emerged which can be done by 2 advanced jugglers and 1 intermediate juggler.  It consists of a hard position, less hard position, and the baby position.  The two hard positions are doing essentially a double 3 count (pass pass self) with an extra pass tucked in there, while the baby position is cycling through an alternating 4 and 3 count passing sequence.  It is named Shifty-Eyed Scoundrel because it requires a moderate amount of "eye shifting" to pass for the hard position, and it's a downright scoundrel to master.
+
+| **Juggler/beat** | **1** | **2** | **3** | **4** | **5** | **6** | **7** |
+|-------------|-------|-------|-------|-------|-------|-------|-------|
+| **A**       | B     | B     | C     |       | B     | C     |       |
+| **B**       | A     | A     | A     |       | A     | A     |       |
+| **C**       |       |       | B     |       |       | B     |       |
+
+> * Both hands counting
+> * This pattern mirrors itself, so it's technically a 14 count pattern
+
+Pattern by Nathan Nard 2022.
+
 ## Puzzle and Variations
 
 ### Three-piece Puzzle (for 2 jugglers)
