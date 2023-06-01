@@ -10,7 +10,7 @@ pdf: *.md
 				 -V geometry="textwidth=468pt" \
 				 -V geometry="textheight=674pt" \
 				 -V geometry="voffset=10pt" \
-				 -V majpatternbookversion="3.1" \
+				 -V majpatternbookversion="3.1.1" \
 				 -V date="\today" \
 				 -V fontsize=12pt \
 				 -V links-as-notes=True \
