@@ -43,7 +43,7 @@ person; we tried way outside the pattern, but I think we could also do it with h
 by 6 ft or so, as the two primary feeders.   It looks to me almost like a site-swap pattern, and might be the
 basis of another big pattern
 
-## Auguest 20, 2023
+## August 20, 2023
 
 We recently worked out what we're calling the 1-3-5 Turbo.  Same moves as standard Turbo, but there's a base 5 count and passes only happen on beats 1 and 3.  The feeder passes on both 1's and 3's, the movers skip one of those, and stay on 5 count.  The 4-in-a-row 2-count phenomena in the feeder position of the regular Turbo turns into 4 passes witha 3-count gap and 2 2-count gaps.  We note that potential variations, like 1-4-5 are equivalent, giving the said
 gaps, but, a 1-2-5 would be like a chocolate start with three selves.  
@@ -53,3 +53,15 @@ As you lengthen the cycle, there become multiple ways to put in the passes.  E.g
 2 passes, which by simplification is just 2/1 or 2 count.  But it could be pass-pass-self-self instead of
 pass-self-pass-self.  So the former could be written 4/1-2 count, where the regular 2-count is 4/1-3 count
 In that new Turbo, we do a 5/1-3 count in the feed, followed by 4 copies of regular 5/1 count
+
+## Nov 9 2023 (Thurs)
+
+Me, Nick and Mel di some nice variations of 1-3-5 clover, where we alternate
+the pass beat after each block of 5.  E.g., 1-3-5 then 1-2-5; or 1-3-5 x 2 then
+1-2-5 x2...a good brain game
+
+Idea to try: 7 count base, pass in 3 spots, like 1-3-6:7
+
+We also do a nice extra club 1 feeds 2 pattern, which I don't think I've 
+ever done, but it's pretty nice.  Just 7 3-count by the feeder, and the
+feedees do 6 count either left or right.  If the feeder passes straights then the feedees cross, and vice versa.  Adding a switch side, the mover does a 7 count, which is nice compared to the move in the more common 2-count extra-club feed (where we need triples to balance it out).
