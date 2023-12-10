@@ -31,3 +31,22 @@ The model has these assumptions:
 
 
 https://www.youtube.com/watch?v=OZHeaFwWl2s
+
+###
+
+12/09/23 from Nathan, based on timing variation of clover from Thursday night:
+
+Call it 1-3-6 on 7 beat 3-leaf clover
+
+Here's the piano roll.  Some observations:
+168 throws to get back to starting orientation (colors)
+There's 3 fixed positions that feed differently that correspond to each petal
+A left handed 2 count feed
+18 throws in the petal
+2 count, 3 count feed (R, R, L)
+19 throws in the petal
+3 count, 2 count feed (L, R, R)
+19 throws in the petal, mirrors the per
+Total throws to go around the full clover is 56 (18+19+19)
+So 3 full clovers are required to get the colors back to their starting orientation. (56*3 = 168)
+
