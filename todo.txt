@@ -70,4 +70,5 @@ feedees do 6 count either left or right.  If the feeder passes straights then th
 ## Dec 17, 2023
 
 We try at MCS and sort of get my new pattern from yesterday..."Tricky Middle", which is a six-person variation of the 2pi/3.   4-loops, each with 3 marks (equidistant at 2pi/3 radians apart on each circle).  Circles are tied together like 4 balloons. People set up in alternate spots.  The steady state is pass to the left, pass to the right (next position); move across and pass back.   Pretty nice!
-Any count you like, but 6 count or 5 count a good start. (See media/TrickyMiddle.jpg)
+Any count you like, but 6 count or 5 count a good start. (See media/TrickyMiddle.jpg) There's a nice feature that after each passing beat some pair of jugglers moves through the middle, along parallel lines and in opposite directions (and they pass to each other after the move).   Further, on subsequent beats, the moves criss-cross, like a + sign, first left-right, next up-down, continuing.
+
