@@ -65,3 +65,9 @@ Idea to try: 7 count base, pass in 3 spots, like 1-3-6:7
 We also do a nice extra club 1 feeds 2 pattern, which I don't think I've 
 ever done, but it's pretty nice.  Just 7 3-count by the feeder, and the
 feedees do 6 count either left or right.  If the feeder passes straights then the feedees cross, and vice versa.  Adding a switch side, the mover does a 7 count, which is nice compared to the move in the more common 2-count extra-club feed (where we need triples to balance it out).
+
+
+## Dec 17, 2023
+
+We try at MCS and sort of get my new pattern from yesterday..."Tricky Middle", which is a six-person variation of the 2pi/3.   4-loops, each with 3 marks (equidistant at 2pi/3 radians apart on each circle).  Circles are tied together like 4 balloons. People set up in alternate spots.  The steady state is pass to the left, pass to the right (next position); move across and pass back.   Pretty nice!
+Any count you like, but 6 count or 5 count a good start. (See media/TrickyMiddle.jpg)
