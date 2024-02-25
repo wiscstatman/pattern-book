@@ -27,7 +27,7 @@ cls[z1==1&z2==1&z3==1] <- "red"
 
 pdf( file="ks-6-7-6.5.pdf", width=9, height=3 )
 plot( 1:N, pmax(z1,z2,z3), type="h", axes=FALSE, lwd=2, col=cls , 
-	xlab="magenta = 6 cnt; blue = 7 cnt; green = 6 cnt/5 cnt; kill switch@37",
-		main="Mark's 6-7-6/5 Kill Switch: Hex formation (6 jugglers)", ylab="" )
+	xlab="magenta = 6 cnt; blue = 7 cnt; green = 6 cnt/5 cnt; kill screen@37",
+		main="Mark's 6-7-6/5 Kill Screen: Hex formation (6 jugglers)", ylab="" )
 axis(side=1, at=1:37, cex.axis=1/2, line=-1)
 dev.off()
