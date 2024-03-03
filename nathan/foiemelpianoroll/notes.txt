@@ -1,0 +1,11 @@
+
+From Nathan, Feb 28, 24
+
+Hi,
+
+Attached you'll find a couple Piano rolls for a 5 count and 6 count Foie Mel, along with some scratch work that I don't want to refine (too lazy right now).  
+
+Foie Mel is a very interesting pattern!  I haven't been able to formalize a formal proof yet, but I have a strong suspicion that the pattern will always have a complete cycle of exactly 6 passing beats, regardless of the counting base (just constant counts and ignoring varying counts like the 1-3-5 that we've been playing with, not sure about those at the moment).  You can see in the piano rolls that both 5 count and 6 count finish in 6 passing beats, supporting this hypothesis.
+
+Interestingly, the 6 count variation has 4 distinct hexagonal cycles within which exactly two clubs traverse each.  You can see a vague sketch of these cycles in the scratch work I attached.
+
