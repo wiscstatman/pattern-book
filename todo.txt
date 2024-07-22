@@ -96,3 +96,5 @@ backward on each transition; run Saturday night at IJA (me/Mel/Keenan/Nathan/Ste
 I started the version 4.0 last week by copying/modifying material withing a google doc
 
 
+Idea...have a scoring/rating system for patterns...popularity and difficulty
+
