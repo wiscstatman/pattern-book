@@ -50,3 +50,13 @@ A left handed 2 count feed
 Total throws to go around the full clover is 56 (18+19+19)
 So 3 full clovers are required to get the colors back to their starting orientation. (56*3 = 168)
 
+###  10/08/24 from Nathan, on Turbo variants (see Turbo.xlsx)
+
+Hi,
+
+Here's the piano rolls for the standard Turbo, as well as the 135on7 and 146on7 variants.  
+
+Some interesting observations:
+- all three take 18 passing beats (one full cycle) to return the colors. 
+- in the 146on7 pattern, Nate and Mike only touch 2 of Mel's clubs. 
+
