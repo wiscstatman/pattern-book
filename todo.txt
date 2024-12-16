@@ -98,3 +98,14 @@ I started the version 4.0 last week by copying/modifying material withing a goog
 
 Idea...have a scoring/rating system for patterns...popularity and difficulty
 
+
+## December 12, 2024
+
+Last week and again today we had good runs of what we're calling the "Celtic Sheild Knot", which sets up like the old
+`tricky in the middle`, but has a much better pass sequence so it's quite easy to do.  Set up as four connected loops; each
+loop on the corner of a square.  I put clubs down at each loop, pointing into the center of the square.  Now each
+club marks three positions: one on its left, one behind (outside), and one on its right (we don't couunt one inside).  With
+four loops and 3 spots per loop we have 12 spots, and we put the six jugglers alternatively into 1/2 of these spots, where the direction of motion goes right-side --> left-side of loop on left --> back side --> right side ..
+Notice that two of the loops have a single juggler and two have two; they are more or less symmetric pairs.
+And the passing sequence is this: if you're the solo juggler in a loop you exchange with the outside juggler on your right.
+That covers 4; the only others left are the two jugglers on the right-side of their respective loop; they exchange.  After an exchange, everyone advances one position.  It goes very nicely on 6 count, but surely 5 or 4 would be quite doable with a few reps.
