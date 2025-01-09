@@ -14,7 +14,7 @@ tt <- seq( 0, 2*pi, length=22 )
 xx <- aa*cos(tt)/( 1 + (sin(tt))^2 )
 yy <- aa*sin(tt)*cos(tt)/(1+(sin(tt))^2 )
 
-plot( xx, yy )  ## those are equ-angle positions...let's do equi-arc-length positions..
+#plot( xx, yy )  ## those are equ-angle positions...let's do equi-arc-length positions..
 
 ###
 
@@ -68,9 +68,9 @@ print(kap)
 # knock out center point
 xx2[c(11,22)] <- NA; yy2[c(11,22)] <- NA
 
-#plot( xx2, yy2, xlim= rn.x, ylim=rn.y, asp=1, axes=FALSE, xlab="",ylab="", type="n")
-rn <- range( c(rn.x,rn.y) )
-plot( xx2, yy2, xlim= rn, ylim=rn, asp=1, axes=FALSE, xlab="",ylab="", type="n")
+plot( xx2, yy2, xlim= rn.x, ylim=rn.y, asp=1, axes=FALSE, xlab="",ylab="", type="n")
+#rn <- range( c(rn.x,rn.y) )
+#plot( xx2, yy2, xlim= rn, ylim=rn, asp=1, axes=FALSE, xlab="",ylab="", type="n")
 
 axis(side=1, las=1, cex.axis=.7)
 axis(side=2, las=1, cex.axis=.7)
@@ -81,7 +81,7 @@ abline(v=0,col="grey")
 tt <- seq( 0, 2*pi, length=100 )
 xx3 <- aa*cos(tt)/( 1 + (sin(tt))^2 )
 yy3 <- aa*sin(tt)*cos(tt)/(1+(sin(tt))^2 )
-lines( xx3, yy3, col="yellow", lwd=30 )
+lines( xx3, yy3, col="yellow", lwd=20 )
 
 ## put in starting points
 oddspots.x <- xx2[c(1,3,5,7,9,10,13,15,17,19,21)]
@@ -96,8 +96,8 @@ oddspots.x[m] <- oddspots.x[m] + eps
 oddspots.y[m] <- oddspots.y[m] + eps
 
 
-points( oddspots.x, oddspots.y, pch=22, col="white", cex=1.6 )
-points( oddspots.x, oddspots.y, pch=15, col="blue", cex=1.5 )
+#points( oddspots.x, oddspots.y, pch=22, col="white", cex=1.6 )
+#points( oddspots.x, oddspots.y, pch=15, col="blue", cex=1.5 )
 
 ## put in 2nd points
 espots.x <- xx2[c(2,4,6,8,10,12,14,16,18,20,21)]
@@ -109,8 +109,8 @@ m <- length(espots.x)
 espots.x[m] <- espots.x[m] - eps
 espots.y[m] <- espots.y[m] + eps
 
-points( espots.x, espots.y, pch=21, col="white", cex=1.6 )
-points( espots.x, espots.y, pch=16, col="green", cex=1.5 )
+#points( espots.x, espots.y, pch=21, col="white", cex=1.6 )
+#points( espots.x, espots.y, pch=16, col="green", cex=1.5 )
 
 
 #dev.off()
@@ -131,14 +131,19 @@ ok <- !is.na(ii) & !is.na(ss)
 
 # let's do segments
 
-wid <- 1/2
+wid <- 1
 wx <- wid/sqrt( 1+ ss^2 )
 wy <- wid/sqrt( 1+1/ss^2 )
 
-xxleft <- xx2 - wx
-xxright <- xx2 + wx
+#xxleft <- xx2 - wx
+#xxright <- xx2 + wx
+#yyleft <-yy2 - wy
+#yyright <-  yy2+wy
+xxleft <- xx2 - sign(ss)*wx
+xxright <- xx2 + sign(ss)*wx
 yyleft <-yy2 - wy
 yyright <-  yy2+wy
-for( j in 1:length(ii) ){ if(ok[j]){ lines( c(xxleft[j],xxright[j]), c(yyleft[j], yyright[j]) ) } }
 
-** there's still a plus/minus issue in forming the endpoints...
+for( j in 1:length(ii) ){ if(ok[j]){ lines( c(xxleft[j],xxright[j]), c(yyleft[j], yyright[j]), col="magenta", 
+lwd=2 ) } }
+
