@@ -47,6 +47,9 @@ ombar <- 2.622 # gamma(1/4)^2 / (2 * sqrt(2*pi))
 
 aa <- 11*6/(2*ombar)   ### 11 jugglers x 6 ft apart
 
+##
+#N <- 15*2
+#aa <- 15*6/(2*ombar)  ### 15 jugglers per direction
 
 rr <- numeric(N)
 for( i in 1:N ){ rr[i] <- Re( sl( 2*(ombar*(i)/N) ) ) }
@@ -67,6 +70,7 @@ print(kap)
 
 # knock out center point
 xx2[c(11,22)] <- NA; yy2[c(11,22)] <- NA
+#xx2[c(15,30)] <- NA; yy2[c(15,30)] <- NA
 
 plot( xx2, yy2, xlim= rn.x, ylim=rn.y, asp=1, axes=FALSE, xlab="",ylab="", type="n")
 #rn <- range( c(rn.x,rn.y) )
@@ -131,19 +135,42 @@ ok <- !is.na(ii) & !is.na(ss)
 
 # let's do segments
 
-wid <- 1
+wid <- 1/2
 wx <- wid/sqrt( 1+ ss^2 )
 wy <- wid/sqrt( 1+1/ss^2 )
 
-#xxleft <- xx2 - wx
-#xxright <- xx2 + wx
-#yyleft <-yy2 - wy
-#yyright <-  yy2+wy
 xxleft <- xx2 - sign(ss)*wx
 xxright <- xx2 + sign(ss)*wx
 yyleft <-yy2 - wy
 yyright <-  yy2+wy
 
-for( j in 1:length(ii) ){ if(ok[j]){ lines( c(xxleft[j],xxright[j]), c(yyleft[j], yyright[j]), col="magenta", 
-lwd=2 ) } }
+quad <- rep(0,length(ss) )
+quad[ xx2 > 0 & yy2 > 0 ] <- 1
+quad[ xx2 < 0 & yy2 > 0 ] <- 2
+quad[ xx2 < 0 & yy2 < 0 ] <- 3
+quad[ xx2 > 0 & yy2 < 0 ] <- 4
+## flip left and right in quad 1 and quad 3
+tmpx <- xxleft
+xxleft[quad ==1 | quad == 3] <- xxright[quad ==1 | quad==3]
+xxright[quad ==1 | quad == 3] <- tmpx[quad ==1 | quad==3]
+tmpy <- yyleft
+yyleft[quad ==1 | quad == 3] <- yyright[quad ==1 | quad==3]
+yyright[quad ==1 | quad == 3] <- tmpy[quad ==1 | quad==3]
+
+for( j in 1:length(ii) )
+ { 
+ if(ok[j])
+  { 
+
+   if( j %% 2 == 0 )
+     pp <- c(0,1)
+   else
+     pp <- c(15,16)
+
+#   lines( c(xxleft[j],xxright[j]), c(yyleft[j], yyright[j]), col="magenta", lwd=2 ) 
+   points( c(xxleft[j],xxright[j]), c(yyleft[j], yyright[j]), col="blue", 
+		pch= pp, cex=2)
+	print(pp)
+  } 
+ }
 
