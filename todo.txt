@@ -108,4 +108,30 @@ club marks three positions: one on its left, one behind (outside), and one on it
 four loops and 3 spots per loop we have 12 spots, and we put the six jugglers alternatively into 1/2 of these spots, where the direction of motion goes right-side --> left-side of loop on left --> back side --> right side ..
 Notice that two of the loops have a single juggler and two have two; they are more or less symmetric pairs.
 And the passing sequence is this: if you're the solo juggler in a loop you exchange with the outside juggler on your right.
-That covers 4; the only others left are the two jugglers on the right-side of their respective loop; they exchange.  After an exchange, everyone advances one position.  It goes very nicely on 6 count, but surely 5 or 4 would be quite doable with a few reps.
+That covers 4; the only others left are the two jugglers on the right-side of their respective loop; they exchange.  After an exchange, everyone advances one position.  It goes very nicely on 6 count, but surely 5 or 4 would be quite doable with a few reps.  
+
+...we did this knot in the Madfest show (me, Mel, Chan, Goose, Keenan, and Mark!)
+
+
+## Post madfest; end Feb 1 2025
+
+The Madjugglers performance went pretty well (though me, Nathan, and Mel had a few restarts to
+get the laxative working!
+
+We tried the all-moving 26-person lemniscate for the big-pattern on Jan 19.   
+People were keen and surprisingly positive about the try, but it never worked; the layout was far too compressed.  Prior to set up I thought it would be a bit compressed, but it got way too crowded at the crossing.  I considered
+stretching the dimensions, but I worried that would make the cross-over step too far (more than 6 ft)
+I need to reconfigure it, where we go 4 to 5 feet between steps on the lemniscate arc, and then
+rather than have twice that being the crossing distance, somehow carve out the central cross separately and keep that at about 6 feet.   We also had undue compression with the 4 stationary jugglers
+(who we set up as Kings in the card layout)
+
+
+Last Thursday (Jan 30) we (me, Jeff, Mel, Nathan, and Carly) came up with a switch-sides version
+of the egg-beater.  Easiest to try on 3-count base; remember the 8 standard egg-beater beats where
+each mover does 2 passes at the top (on every other base beat) then moves to the bottom--in the 
+standard they move to the bottom of their same side, but we worked out how they can cross to the
+other side...letting the other sides bottom person pass on the next even beat, then cutting over
+in front swapping roles with that juggler...that one takes your would-be next even beat and you
+swing back to the top to take their next odd beat.   We worked out one way that all 4 movers can do that swapping; so far our version is asymmetric, with the juggler picking up the 2 bottom passes in a
+row coming off the same side....various names; best is "stick a fork in it", since it took a while
+to figure it out and get it "done"
