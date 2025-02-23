@@ -135,3 +135,11 @@ in front swapping roles with that juggler...that one takes your would-be next ev
 swing back to the top to take their next odd beat.   We worked out one way that all 4 movers can do that swapping; so far our version is asymmetric, with the juggler picking up the 2 bottom passes in a
 row coming off the same side....various names; best is "stick a fork in it", since it took a while
 to figure it out and get it "done"
+##
+
+5 person extra club star...on Feb 20/25, we figured out how to make a very cool extension, where
+non-doublers are either selfing or in a straights star single...in the steady state each juggler does 
+double - single/star - single/star - self - self, where the double is on their respective count (crossing and
+always to the same person), and the singles are added to fill up the star, with rights to the right and
+lefts to the lefts...tough pattern...I thought of adding singles, Peter and Nathan figured out exactly how
+to get the max number and rhythm of the double sand singles
