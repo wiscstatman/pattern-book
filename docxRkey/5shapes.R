@@ -25,6 +25,15 @@ library(igraph)
  y <- rr*sin(theta)
  ll.d <- cbind(x,y)
 
+ ## quincunx
+ ll.e <- rbind( c(0,0), c(-1,1), c(-1,-1), c(1,-1), c(1,1) )
+
+ ## eggbeater 
+ ll.f <- rbind( c(0,2), c(-1,1), c(-1,0), c(1,0), c(1,1) )
+
+ ## twister (set up)
+ ll.g <- rbind( c(0,1), c(0,-1), c( -1,0 ), c(0,0), c(1,0) )
+
 
  ## 2 on 3
  pdf( file="5a.pdf" )
@@ -63,3 +72,33 @@ library(igraph)
 	edge.color="black" , rescale=FALSE, vertex.color="grey",
 	vertex.label.cex=3, vertex.size=45 )
  dev.off()
+
+ ## quincunx
+ pdf( file="5e.pdf" )
+ par( mgp=rep(1,3) )
+ plot(g,  layout=ll.e, xlim=c(-1.2,1.2), ylim=c(-1.2,1.2),
+	edge.arrow.width=0, edge.width=3, vertex.label=c("D","B","C","A", "E"),
+	edge.color="black" , rescale=FALSE, vertex.color="grey",
+	vertex.label.cex=3, vertex.size=45 )
+ dev.off()
+
+ ## eggbeater 
+ pdf( file="5f.pdf" )
+ par( mgp=rep(1,3) )
+ plot(g,  layout=ll.f, xlim=c(-1.2,1.2), ylim=c(-.2,2.2),
+	edge.arrow.width=0, edge.width=3, vertex.label=c("A","B","C","D", "E"),
+	edge.color="black" , rescale=FALSE, vertex.color="grey",
+	vertex.label.cex=3, vertex.size=45 )
+ dev.off()
+
+# ## twister (set up)
+# pdf( file="5g.pdf" )
+# par( mgp=rep(1,3) )
+# plot(g,  layout=ll.g, xlim=c(-1.2,1.2), ylim=c(-1.2,1.2),
+#	edge.arrow.width=0, edge.width=3, vertex.label=c("A","B","C","D", "E"),
+#	edge.color="black" , rescale=FALSE, vertex.color="grey",
+#	vertex.label.cex=3, vertex.size=45 )
+# dev.off()
+
+
+
