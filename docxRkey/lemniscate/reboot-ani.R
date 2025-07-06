@@ -8,9 +8,9 @@
 
 ## see https://mathworld.wolfram.com/Lemniscate.html
 
-aa <- 12.6  ## 1/2 width, feet; see notes from 12/29;  11 jugglers * 6 ft apart/ 5.244 (lemniscate arc length)
-
+##aa <- 12.6  ## 1/2 width, feet; see notes from 12/29;  11 jugglers * 6 ft apart/ 5.244 (lemniscate arc length)
 ##
+
 aa <- 22.8
 
 t0 <- seq( 0, 2*pi, length=100 )
@@ -31,15 +31,6 @@ p <- Vectorize(function(s) {
 })
 # lemnniscate constant
 ombar <- 2.622 # gamma(1/4)^2 / (2 * sqrt(2*pi))
-# plot
-#s_ <- seq(0, ombar, length.out = 100)
-#s_ <- seq(0, ombar, length.out = 22)
-#lemniscate <- t(p(s_))
-#plot(lemniscate, type = "b", col = "yellow", lwd = 5)
-#lines(cbind(lemniscate[, 1L], -lemniscate[, 2L]), col="red", lwd = 3)
-
-##
-## https://en.wikipedia.org/wiki/Lemniscate_elliptic_functions
 
 library(jacobi)
 
@@ -49,10 +40,6 @@ ombar <- 2.622 # gamma(1/4)^2 / (2 * sqrt(2*pi))
 aa <- 11*6/(2*ombar)   ### 11 jugglers x 6 ft apart
 
 aa <- 22.8
-
-##
-#N <- 15*2
-#aa <- 15*6/(2*ombar)  ### 15 jugglers per direction
 
 rr <- numeric(N)
 for( i in 1:N ){ rr[i] <- Re( sl( 2*(ombar*(i)/N) ) ) }
@@ -74,14 +61,14 @@ print(kap)
 xx2[c(11,22)] <- NA; yy2[c(11,22)] <- NA
 #xx2[c(15,30)] <- NA; yy2[c(15,30)] <- NA
 
-plot( xx2, yy2, xlim= rn.x, ylim=rn.y, asp=1, axes=FALSE, xlab="",ylab="", type="n")
+#plot( xx2, yy2, xlim= rn.x, ylim=rn.y, asp=1, axes=FALSE, xlab="",ylab="", type="n")
 #rn <- range( c(rn.x,rn.y) )
 #plot( xx2, yy2, xlim= rn, ylim=rn, asp=1, axes=FALSE, xlab="",ylab="", type="n")
+#axis(side=1, las=1, cex.axis=.7)
+#axis(side=2, las=1, cex.axis=.7)
+#abline(h=0,col="grey")
+#abline(v=0,col="grey")
 
-axis(side=1, las=1, cex.axis=.7)
-axis(side=2, las=1, cex.axis=.7)
-abline(h=0,col="grey")
-abline(v=0,col="grey")
 
 ## make a curve
 tt <- seq( 0, 2*pi, length=100 )
@@ -116,7 +103,7 @@ espots.x[m] <- espots.x[m] - eps
 espots.y[m] <- espots.y[m] + eps
 
 #points( espots.x, espots.y, pch=21, col="white", cex=1.6 )
-#points( espots.x, espots.y, pch=16, col="green", cex=1.5 )
+#points( espots.x, espots.y, pch=16, col="blue", cex=1.5 )
 
 
 
@@ -136,7 +123,7 @@ ok <- !is.na(ii) & !is.na(ss)
 
 # let's do segments
 
-wid <- 1/2
+wid <- 1.5
 wx <- wid/sqrt( 1+ ss^2 )
 wy <- wid/sqrt( 1+1/ss^2 )
 
@@ -169,9 +156,9 @@ for( j in 1:length(ii) )
      pp <- c(15,16)
 
 #   lines( c(xxleft[j],xxright[j]), c(yyleft[j], yyright[j]), col="magenta", lwd=2 ) 
-   points( c(xxleft[j],xxright[j]), c(yyleft[j], yyright[j]), col="blue", 
-		pch= pp, cex=2)
-	print(pp)
+#   points( c(xxleft[j],xxright[j]), c(yyleft[j], yyright[j]), col="blue", 
+#		pch= pp, cex=2)
+#	print(pp)
   } 
  }
 
@@ -183,7 +170,7 @@ nms.left <- rep(NA,22)
 nms.left[c(1,3,5,7,9,11,13,15,17,19,21)] <- rev( c("A","B","C","D","E","F","G","H","I","J","K") )
 nms.left[seq(2,22,by=2)] <- rev( c("A","B","C","D","E","F","G","H","I","J","K") )
 
-par( mar=rep(1,4), mfrow=c(4,1) )
+
 
 hh.right<- rbind( c(xxright[1], yyright[1]),
 			cbind(xxright[1:21], yyright[1:21] ) )
@@ -196,45 +183,71 @@ nms.right[c(2,4,6,8,10,12,14,16,18,20,22)] <- ( c("k","a","b","c","d","e","f","g
 nms.right[seq(1,21,by=2)] <-  c("k", "a","b","c","d","e","f","g","h","i","j") 
 nms.right <- rev(nms.right)
 
+dr <- data.frame( nms.right, hh.right )
+
 ## 
 od <- seq(1,21,by=2)
 ev  <- seq(2,22,by=2)
+ev0 <- ev; od0 <- od
 
 foo <- c(xxleft, xxright)
 xl <- range( foo[!is.na(foo)] )
 foo <- c(yyleft, yyright)
 yl <- range( foo[!is.na(foo)] )
 
+## lines are still wrong
 
-# beat 1
-plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl )
-text( hh.right[od,1], hh.right[od,2], nms.right[od], col="red")
-text( hh.left[od,1], hh.left[od,2], nms.left[od] )
+library(animation)
+
+saveGIF( {
+par( mar=rep(0,4) )
+plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl, asp=1 )
+lines( xx3, yy3, col="yellow", lwd=20 )
+points( xx2, yy2, col="blue" )
+  for( i in seq(1,19,by=2) ){ lines( c( xxleft[i], xxright[i+2]), c(yyleft[i], yyright[i+2] ), col="pink", lwd=2 ) }
+text( hh.right[od,1], hh.right[od,2], nms.right[od], col="red", cex=2)
+text( hh.left[od,1], hh.left[od,2], nms.left[od] , cex=2)
 text(-15,0,"1")
-# draw the pass
+
 
 # beat 2
-plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl )
-text( hh.right[ev,1], hh.right[ev,2], nms.right[(ev)], col="red")
-text( hh.left[ev,1], hh.left[ev,2], nms.left[ev] )
+plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl , asp=1)
+lines( xx3, yy3, col="yellow", lwd=20 )
+points( xx2, yy2, col="blue" )
+  for( i in seq(2,20,by=2) ){ lines( c( xxleft[i], xxright[i+2]), c(yyleft[i], yyright[i+2] ), col="pink", lwd=2 ) }
+text( hh.right[ev,1], hh.right[ev,2], nms.right[(ev)], col="red", cex=2)
+text( hh.left[ev,1], hh.left[ev,2], nms.left[ev] , cex=2)
 text(-15,0,"2")
 
-# shift the labels
-shift <- c( 21:22, 1:20 )
-hh.right <- hh.right[shift,]
-hh.left<- hh.left[shift,]
+cnt <- 2
+while( cnt <= 21 )
+ {
+  # shift the labels
+  shift <- c( 11, 1:10 )
+  od <- od[shift]
+  ev <- ev[shift]
 
-***still f'd up below
+  ## odd beat
+  cnt <- cnt+1
+  plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl , asp=1)
+  lines( xx3, yy3, col="yellow", lwd=20 )
 
+  points( xx2, yy2, col="blue" )
+  text( hh.right[od0,1], hh.right[od0,2], nms.right[od], col="red", cex=2)
+  text( hh.left[od0,1], hh.left[od0,2], nms.left[od], cex=2 )
+  text(-15,0,cnt)
+  for( i in seq(1,19,by=2) ){ lines( c( xxleft[i], xxright[i+2]), c(yyleft[i], yyright[i+2] ), col="green", lwd=2 ) }
 
-# beat 3
-plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl )
-text( hh.right[ev,1], hh.right[ev,2], nms.right[(ev)], col="red")
-text( hh.left[ev,1], hh.left[ev,2], nms.left[ev] )
-text(-15,0,"2")
+  
+  # even beat
+  cnt <- cnt+1
+  plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl, asp=1 )
+  lines( xx3, yy3, col="yellow", lwd=20 )
+  points( xx2, yy2, col="blue" )
+  text( hh.right[ev0,1], hh.right[ev0,2], nms.right[ev], col="red", cex=2)
+  text( hh.left[ev0,1], hh.left[ev0,2], nms.left[ev], cex=2 )
+  text(-15,0,cnt)
+  for( i in seq(2,20,by=2) ){ lines( c( xxleft[i], xxright[i+2]), c(yyleft[i], yyright[i+2] ), col="pink", lwd=2 ) }
+ }
 
-# beat 4
-plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl )
-text( hh.right[ev,1], hh.right[ev,2], nms.right[(ev)], col="red")
-text( hh.left[ev,1], hh.left[ev,2], nms.left[ev] )
-
+}, interval=1, movie.name="lem1.gif" )
