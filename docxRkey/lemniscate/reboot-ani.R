@@ -54,7 +54,7 @@ yy2 <- yy*aa
 rn.x <- range( xx2 )
 rn.y <- range( yy2 )
 kap <- (rn.y[2] -rn.y[1])/(rn.x[2]-rn.x[1])
-print(kap)
+#print(kap)
 
 
 # knock out center point
@@ -123,7 +123,7 @@ ok <- !is.na(ii) & !is.na(ss)
 
 # let's do segments
 
-wid <- 1.5
+wid <- 1.2
 wx <- wid/sqrt( 1+ ss^2 )
 wy <- wid/sqrt( 1+1/ss^2 )
 
@@ -199,25 +199,82 @@ yl <- range( foo[!is.na(foo)] )
 
 library(animation)
 
+
+xstop <- 3/2
+ystop <- 6
+x.odd <- rbind(  c( hh.left[1,1], hh.right[19,1] ), 
+		 c( hh.left[3,1], hh.right[17,1] ),
+		 c( hh.left[5,1], hh.right[15,1] ),
+		 c( hh.left[7,1], hh.right[13,1] ), 
+		 c( hh.left[9,1], xstop ), 
+		 c( hh.left[11,1], hh.right[11,1] ), 
+		 c( -xstop, hh.right[9,1] ), 
+		 c( hh.left[13,1], hh.right[7,1] ) ,
+		 c( hh.left[15,1], hh.right[5,1] ) ,
+		 c( hh.left[17,1], hh.right[3,1] ) ,
+		 c( hh.left[19,1], hh.right[1,1] ) )
+
+y.odd <- rbind(  c( hh.left[1,2], hh.right[19,2] ), 
+		 c( hh.left[3,2], hh.right[17,2] ),
+		 c( hh.left[5,2], hh.right[15,2] ),
+		 c( hh.left[7,2], hh.right[13,2] ), 
+		 c( hh.left[9,2], -ystop ),
+		 c( hh.left[11,2], hh.right[11,2] ), 
+		 c( ystop, hh.right[9,2] ), 
+		 c( hh.left[13,2], hh.right[7,2] ), 
+		 c( hh.left[15,2], hh.right[5,2] ) ,
+		 c( hh.left[17,2], hh.right[3,2] ) ,
+		 c( hh.left[19,2], hh.right[1,2] ) )
+
+x.even<- rbind(  c( hh.left[2,1], hh.right[18,1] ), 
+		 c( hh.left[4,1], hh.right[16,1] ),
+		 c( hh.left[6,1], hh.right[14,1] ),
+		 c( hh.left[8,1], hh.right[12,1] ), 
+		 c( hh.left[12,1], hh.right[8,1] ) ,  
+		 c( hh.left[14,1], hh.right[6,1] ) ,  
+		 c( hh.left[16,1], hh.right[4,1] ) ,  
+		 c( hh.left[18,1], hh.right[2,1] ) ,  
+		 c( hh.left[20,1], -xstop ) ,  
+		 c( hh.right[20,1], +xstop ) ,  
+		 c( hh.right[22,1], hh.left[22,1] ) )  
+
+y.even<- rbind(  c( hh.left[2,2], hh.right[18,2] ), 
+		 c( hh.left[4,2], hh.right[16,2] ),
+		 c( hh.left[6,2], hh.right[14,2] ),
+		 c( hh.left[8,2], hh.right[12,2] ),
+		 c( hh.left[12,2], hh.right[8,2] ) ,  
+		 c( hh.left[14,2], hh.right[6,2] ) ,  
+		 c( hh.left[16,2], hh.right[4,2] ) ,  
+		 c( hh.left[18,2], hh.right[2,2] ) ,  
+		 c( hh.left[20,2], -ystop ) ,  
+		 c( hh.right[20,2], +ystop ) ,  
+		 c( hh.right[22,2],  hh.left[22,2] ) )  
+
+
+
+cx <- 3
+
 saveGIF( {
 par( mar=rep(0,4) )
 plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl, asp=1 )
 lines( xx3, yy3, col="yellow", lwd=20 )
 points( xx2, yy2, col="blue" )
-  for( i in seq(1,19,by=2) ){ lines( c( xxleft[i], xxright[i+2]), c(yyleft[i], yyright[i+2] ), col="pink", lwd=2 ) }
-text( hh.right[od,1], hh.right[od,2], nms.right[od], col="red", cex=2)
-text( hh.left[od,1], hh.left[od,2], nms.left[od] , cex=2)
-text(-15,0,"1")
+  for( i in 1:nrow(x.odd) ){ lines( x.odd[i,], y.odd[i,], col="blue", lwd=2 ) }
+text( hh.right[od,1], hh.right[od,2], nms.right[od], col="red", cex=cx)
+text( hh.left[od,1], hh.left[od,2], nms.left[od] , cex=cx)
+text(-15,0,"1", cex=2)
+points( c(xstop,xstop,-xstop,-xstop), c(ystop,-ystop,ystop,-ystop), pch=19, col="green", cex=3 )
 
 
 # beat 2
 plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl , asp=1)
 lines( xx3, yy3, col="yellow", lwd=20 )
 points( xx2, yy2, col="blue" )
-  for( i in seq(2,20,by=2) ){ lines( c( xxleft[i], xxright[i+2]), c(yyleft[i], yyright[i+2] ), col="pink", lwd=2 ) }
-text( hh.right[ev,1], hh.right[ev,2], nms.right[(ev)], col="red", cex=2)
-text( hh.left[ev,1], hh.left[ev,2], nms.left[ev] , cex=2)
-text(-15,0,"2")
+  for( i in 1:nrow(x.even) ){ lines( x.even[i,], y.even[i,], col="blue", lwd=2, lty=2 ) }
+text( hh.right[ev,1], hh.right[ev,2], nms.right[(ev)], col="red", cex=cx)
+text( hh.left[ev,1], hh.left[ev,2], nms.left[ev] , cex=cx)
+text(-15,0,"2", cex=2)
+points( c(xstop,xstop,-xstop,-xstop), c(ystop,-ystop,ystop,-ystop), pch=19, col="green", cex=3 )
 
 cnt <- 2
 while( cnt <= 21 )
@@ -233,10 +290,11 @@ while( cnt <= 21 )
   lines( xx3, yy3, col="yellow", lwd=20 )
 
   points( xx2, yy2, col="blue" )
-  text( hh.right[od0,1], hh.right[od0,2], nms.right[od], col="red", cex=2)
-  text( hh.left[od0,1], hh.left[od0,2], nms.left[od], cex=2 )
-  text(-15,0,cnt)
-  for( i in seq(1,19,by=2) ){ lines( c( xxleft[i], xxright[i+2]), c(yyleft[i], yyright[i+2] ), col="green", lwd=2 ) }
+  text( hh.right[od0,1], hh.right[od0,2], nms.right[od], col="red", cex=cx)
+  text( hh.left[od0,1], hh.left[od0,2], nms.left[od], cex=cx )
+  text(-15,0,cnt, cex=2)
+  for( i in 1:nrow(x.odd) ){ lines( x.odd[i,], y.odd[i,], col="blue", lwd=2 ) }
+  points( c(xstop,xstop,-xstop,-xstop), c(ystop,-ystop,ystop,-ystop), pch=19, col="green", cex=3 )
 
   
   # even beat
@@ -244,10 +302,11 @@ while( cnt <= 21 )
   plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl, asp=1 )
   lines( xx3, yy3, col="yellow", lwd=20 )
   points( xx2, yy2, col="blue" )
-  text( hh.right[ev0,1], hh.right[ev0,2], nms.right[ev], col="red", cex=2)
-  text( hh.left[ev0,1], hh.left[ev0,2], nms.left[ev], cex=2 )
-  text(-15,0,cnt)
-  for( i in seq(2,20,by=2) ){ lines( c( xxleft[i], xxright[i+2]), c(yyleft[i], yyright[i+2] ), col="pink", lwd=2 ) }
+  text( hh.right[ev0,1], hh.right[ev0,2], nms.right[ev], col="red", cex=cx)
+  text( hh.left[ev0,1], hh.left[ev0,2], nms.left[ev], cex=cx )
+  text(-15,0,cnt, cex=2)
+  for( i in 1:nrow(x.even) ){ lines( x.even[i,], y.even[i,], col="blue", lwd=2, lty=2 ) }
+  points( c(xstop,xstop,-xstop,-xstop), c(ystop,-ystop,ystop,-ystop), pch=19, col="green", cex=3 )
  }
 
-}, interval=1, movie.name="lem1.gif" )
+}, interval=1.5, movie.name="lem1.gif", ani.width=960, ani.height=960 )
