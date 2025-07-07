@@ -329,3 +329,5 @@ text( xleft, -22, "*  Pattern by wiscstatman@gmail.com", adj=c(0,0), cex=cx2 )
  }
 
 }, interval=1.5, movie.name="lem-ult.gif", ani.width=960, ani.height=960 )
+
+## could add a note that on every move,  you move next to the person you just passed with
