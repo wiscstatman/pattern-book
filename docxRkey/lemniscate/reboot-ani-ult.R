@@ -176,26 +176,54 @@ y.even<- rbind(  c( hh.left[2,2], hh.right[18,2] ),
 		 c( hh.right[22,2],  hh.left[22,2] ) )  
 
 
+## a stop sign symbol (thanks openAI)
+# Function to generate coordinates for a regular octagon
+
+stop_sign_coords <- function(center = c(0, 0), radius = 1.4) {
+  angles <- seq(0, 2 * pi, length.out = 9) + pi/8  # Offset to get flat top
+  x <- center[1] + radius * cos(angles)
+  y <- center[2] + radius * sin(angles)
+  list(x = x, y = y)
+}
+
+# Example usage
+#plot(NA, xlim = c(-2, 2), ylim = c(-2, 2), asp = 1, xlab = "", ylab = "", main = "Stop Sign Shape")
+
+coords <- stop_sign_coords(center = c(0, 0) )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+
 
 cx <- 3
 cx2 <- 1.8
-xleft <- -18
+xleft <- -20
+lcol <- "purple"
 
 saveGIF( {
 par( mar=rep(0,4) )
 plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl, asp=1 )
 lines( xx3, yy3, col="yellow", lwd=20 )
 points( xx2, yy2, col="blue" )
+# stop signs
+coords <- stop_sign_coords(center = hh.left[22,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+coords <- stop_sign_coords(center = hh.left[11,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+coords <- stop_sign_coords(center = hh.right[22,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+coords <- stop_sign_coords(center = hh.right[11,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+
+# passes
   for( i in 1:nrow(x.odd) ){ lines( x.odd[i,], y.odd[i,], col="blue", lwd=2 ) }
-text( hh.right[od,1], hh.right[od,2], nms.right[od], col="red", cex=cx)
+text( hh.right[od,1], hh.right[od,2], nms.right[od], col=lcol, cex=cx)
 text( hh.left[od,1], hh.left[od,2], nms.left[od] , cex=cx)
 text(-15,0,"1", cex=2)
 points( c(xstop,xstop,-xstop,-xstop), c(ystop,-ystop,ystop,-ystop), pch=19, col="green", cex=3 )
 
 
-text( -24, 14, "Big Lemniscate for 22 Movers (black/red) and 4 Feeders (green)", adj=c(0,0), cex=cx2 )
+text( -24, 14, "Big Lemniscate for 22 Movers (black/purple) and 4 Feeders (green)", adj=c(0,0), cex=cx2 )
 text( xleft, -14, "*  After pass, move to next spot" , adj=c(0,0), cex=cx2)
-text( xleft, -16, "*  Skip a pass after passing to green" , adj=c(0,0), cex=cx2)
+text( xleft, -16, "*  After passing to green, skip pass and stay one beat at stop sign, then pass and cross." , adj=c(0,0), cex=cx2)
 text( xleft, -18, "*  11 passing beats to repeat local cycle; 22 beats full cycle", adj=c(0,0), cex=cx2 )
 text( xleft, -20, "*  Start on 8-count; 6-count target; 4-count when really warmed up!", adj=c(0,0), cex=cx2 )
 text( xleft, -22, "*  Pattern by wiscstatman@gmail.com", adj=c(0,0), cex=cx2 )
@@ -206,16 +234,25 @@ text( xleft, -22, "*  Pattern by wiscstatman@gmail.com", adj=c(0,0), cex=cx2 )
 plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl , asp=1)
 lines( xx3, yy3, col="yellow", lwd=20 )
 points( xx2, yy2, col="blue" )
+# stop signs
+coords <- stop_sign_coords(center = hh.left[22,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+coords <- stop_sign_coords(center = hh.left[11,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+coords <- stop_sign_coords(center = hh.right[22,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+coords <- stop_sign_coords(center = hh.right[11,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
   for( i in 1:nrow(x.even) ){ lines( x.even[i,], y.even[i,], col="blue", lwd=2, lty=2 ) }
-text( hh.right[ev,1], hh.right[ev,2], nms.right[(ev)], col="red", cex=cx)
+text( hh.right[ev,1], hh.right[ev,2], nms.right[(ev)], col=lcol, cex=cx)
 text( hh.left[ev,1], hh.left[ev,2], nms.left[ev] , cex=cx)
 text(-15,0,"2", cex=2)
 points( c(xstop,xstop,-xstop,-xstop), c(ystop,-ystop,ystop,-ystop), pch=19, col="green", cex=3 )
 
 
-text( -24, 14, "Big Lemniscate for 22 Movers (black/red) and 4 Feeders (green)", adj=c(0,0), cex=cx2 )
+text( -24, 14, "Big Lemniscate for 22 Movers (black/purple) and 4 Feeders (green)", adj=c(0,0), cex=cx2 )
 text( xleft, -14, "*  After pass, move to next spot" , adj=c(0,0), cex=cx2)
-text( xleft, -16, "*  Skip a pass after passing to green" , adj=c(0,0), cex=cx2)
+text( xleft, -16, "*  After passing to green, skip pass and stay one beat at stop sign, then pass and cross." , adj=c(0,0), cex=cx2)
 text( xleft, -18, "*  11 passing beats to repeat local cycle; 22 beats full cycle", adj=c(0,0), cex=cx2 )
 text( xleft, -20, "*  Start on 8-count; 6-count target; 4-count when really warmed up!", adj=c(0,0), cex=cx2 )
 text( xleft, -22, "*  Pattern by wiscstatman@gmail.com", adj=c(0,0), cex=cx2 )
@@ -236,7 +273,16 @@ while( cnt <= 21 )
   lines( xx3, yy3, col="yellow", lwd=20 )
 
   points( xx2, yy2, col="blue" )
-  text( hh.right[od0,1], hh.right[od0,2], nms.right[od], col="red", cex=cx)
+# stop signs
+coords <- stop_sign_coords(center = hh.left[22,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+coords <- stop_sign_coords(center = hh.left[11,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+coords <- stop_sign_coords(center = hh.right[22,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+coords <- stop_sign_coords(center = hh.right[11,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+  text( hh.right[od0,1], hh.right[od0,2], nms.right[od], col=lcol, cex=cx)
   text( hh.left[od0,1], hh.left[od0,2], nms.left[od], cex=cx )
   text(-15,0,cnt, cex=2)
   for( i in 1:nrow(x.odd) ){ lines( x.odd[i,], y.odd[i,], col="blue", lwd=2 ) }
@@ -244,9 +290,9 @@ while( cnt <= 21 )
 
 
 
-text( -24, 14, "Big Lemniscate for 22 Movers (black/red) and 4 Feeders (green)", adj=c(0,0), cex=cx2 )
+text( -24, 14, "Big Lemniscate for 22 Movers (black/purple) and 4 Feeders (green)", adj=c(0,0), cex=cx2 )
 text( xleft, -14, "*  After pass, move to next spot" , adj=c(0,0), cex=cx2)
-text( xleft, -16, "*  Skip a pass after passing to green" , adj=c(0,0), cex=cx2)
+text( xleft, -16, "*  After passing to green, skip pass and stay one beat at stop sign, then pass and cross." , adj=c(0,0), cex=cx2)
 text( xleft, -18, "*  11 passing beats to repeat local cycle; 22 beats full cycle", adj=c(0,0), cex=cx2 )
 text( xleft, -20, "*  Start on 8-count; 6-count target; 4-count when really warmed up!", adj=c(0,0), cex=cx2 )
 text( xleft, -22, "*  Pattern by wiscstatman@gmail.com", adj=c(0,0), cex=cx2 )
@@ -258,15 +304,24 @@ text( xleft, -22, "*  Pattern by wiscstatman@gmail.com", adj=c(0,0), cex=cx2 )
   plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl, asp=1 )
   lines( xx3, yy3, col="yellow", lwd=20 )
   points( xx2, yy2, col="blue" )
-  text( hh.right[ev0,1], hh.right[ev0,2], nms.right[ev], col="red", cex=cx)
+# stop signs
+coords <- stop_sign_coords(center = hh.left[22,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+coords <- stop_sign_coords(center = hh.left[11,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+coords <- stop_sign_coords(center = hh.right[22,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+coords <- stop_sign_coords(center = hh.right[11,] )
+polygon(coords$x, coords$y, col = "red", border = "white", lwd = 2)
+  text( hh.right[ev0,1], hh.right[ev0,2], nms.right[ev], col=lcol, cex=cx)
   text( hh.left[ev0,1], hh.left[ev0,2], nms.left[ev], cex=cx )
   text(-15,0,cnt, cex=2)
   for( i in 1:nrow(x.even) ){ lines( x.even[i,], y.even[i,], col="blue", lwd=2, lty=2 ) }
   points( c(xstop,xstop,-xstop,-xstop), c(ystop,-ystop,ystop,-ystop), pch=19, col="green", cex=3 )
 
-text( -24, 14, "Big Lemniscate for 22 Movers (black/red) and 4 Feeders (green)", adj=c(0,0), cex=cx2 )
+text( -24, 14, "Big Lemniscate for 22 Movers (black/purple) and 4 Feeders (green)", adj=c(0,0), cex=cx2 )
 text( xleft, -14, "*  After pass, move to next spot" , adj=c(0,0), cex=cx2)
-text( xleft, -16, "*  Skip a pass after passing to green" , adj=c(0,0), cex=cx2)
+text( xleft, -16, "*  After passing to green, skip pass and stay one beat at stop sign, then pass and cross." , adj=c(0,0), cex=cx2)
 text( xleft, -18, "*  11 passing beats to repeat local cycle; 22 beats full cycle", adj=c(0,0), cex=cx2 )
 text( xleft, -20, "*  Start on 8-count; 6-count target; 4-count when really warmed up!", adj=c(0,0), cex=cx2 )
 text( xleft, -22, "*  Pattern by wiscstatman@gmail.com", adj=c(0,0), cex=cx2 )
