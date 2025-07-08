@@ -11,7 +11,14 @@
 ##aa <- 12.6  ## 1/2 width, feet; see notes from 12/29;  11 jugglers * 6 ft apart/ 5.244 (lemniscate arc length)
 ##
 
-aa <- 22.8
+aa <- 22.8  ## ok for plot; really a=(1/2) width = (N/2)*10'/5.244  , assuming 10' passing PBJ; ## a=21.0 would be better
+							## and we'll use this in the spacing  ; depth=a/sqrt(2)
+							## N/2 = 11...a=21.0 width= 42'         14.8
+                                                        ## N/2 = 13   a=24.8        49.6        17.6
+                                                        ## N/2 = 15   a=28.6        57.2        20.2
+                                                        ## N/2 = 17   a=32.4        64.8        22.9
+
+## ballroom B in Evansville is 48' x 35', evidently, so that can only hold N/2=11; i.e. N=22 movers + 4 feeders
 
 t0 <- seq( 0, 2*pi, length=100 )
 x0 <- aa*cos(t0)/( 1 + (sin(t0))^2 )
