@@ -201,7 +201,7 @@ lcol <- "purple"
 saveGIF( {
 par( mar=rep(0,4) )
 plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl, asp=1 )
-lines( xx3, yy3, col="yellow", lwd=20 )
+lines( x0, y0, col="yellow", lwd=20 )
 points( xx2, yy2, col="blue" )
 # stop signs
 coords <- stop_sign_coords(center = hh.left[22,] )
@@ -232,7 +232,7 @@ text( xleft, -22, "*  Pattern by wiscstatman@gmail.com", adj=c(0,0), cex=cx2 )
 
 # beat 2
 plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl , asp=1)
-lines( xx3, yy3, col="yellow", lwd=20 )
+lines( x0, y0, col="yellow", lwd=20 )
 points( xx2, yy2, col="blue" )
 # stop signs
 coords <- stop_sign_coords(center = hh.left[22,] )
@@ -270,7 +270,7 @@ while( cnt <= 21 )
   ## odd beat
   cnt <- cnt+1
   plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl , asp=1)
-  lines( xx3, yy3, col="yellow", lwd=20 )
+  lines( x0, y0, col="yellow", lwd=20 )
 
   points( xx2, yy2, col="blue" )
 # stop signs
@@ -302,7 +302,7 @@ text( xleft, -22, "*  Pattern by wiscstatman@gmail.com", adj=c(0,0), cex=cx2 )
   # even beat
   cnt <- cnt+1
   plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl, asp=1 )
-  lines( xx3, yy3, col="yellow", lwd=20 )
+  lines( x0, y0, col="yellow", lwd=20 )
   points( xx2, yy2, col="blue" )
 # stop signs
 coords <- stop_sign_coords(center = hh.left[22,] )
