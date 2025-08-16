@@ -14,6 +14,17 @@ library(igraph)
  ss <- sqrt(2)
  ll.b <- rbind( c(0,4/ss), c(0,2/ss), c( -1,0 ), c(0,0), c(1,0) )
 
+ A.choc <- matrix(0,5,5)
+ A.choc[1,3] <- A.choc[3,1] <- 1
+ A.choc[1,4] <- A.choc[4,1] <- 1
+ A.choc[1,5] <- A.choc[5,1] <- 1
+ A.choc[2,3] <- A.choc[3,2] <- 1
+ A.choc[2,4] <- A.choc[4,2] <- 1
+ A.choc[2,5] <- A.choc[5,2] <- 1
+ g.choc <- graph.adjacency(A.choc)
+
+
+
  # wedgee
  ll.c <- rbind( c(-1,-1/2), c(1,-1/2), c(0, 1/ss), c(0,2/ss), c( 0,3/ss ) )
 
@@ -50,6 +61,15 @@ library(igraph)
 	edge.color="black" , rescale=FALSE, vertex.color="grey",
 	vertex.label.cex=3, vertex.size=45 )
  dev.off()
+
+ pdf( file="5a-choc.pdf" )
+ par( mgp=rep(1,3) )
+ plot(g.choc,  layout=ll.a, xlim=c(-1.2,1.2), ylim=c(-.2,2.2),
+	edge.arrow.width=0, edge.width=3, vertex.label=c("A","B","C","D", "E"),
+	edge.color="black" , rescale=FALSE, vertex.color="grey",
+	vertex.label.cex=3, vertex.size=45 )
+ dev.off()
+
 
 
  # apollo
