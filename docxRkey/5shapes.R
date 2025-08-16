@@ -3,7 +3,6 @@ rm( list=ls() )
 library(igraph)
 
  A <- matrix(0,5,5)
-
  #A[1,2] <- A[2,1] <- 1
  #A[1,3] <- A[3,1] <- 1
  #A[1,4] <- A[4,1] <- 1
@@ -13,10 +12,10 @@ library(igraph)
  # get the shapes right for A B vs C D E
  ll.a <- rbind( c(-1/2,2), c(1/2,2), c( -1,0 ), c(0,0), c(1,0) )
  ss <- sqrt(2)
- ll.b <- rbind( c(0,3/ss), c(0,2/ss), c( -1,0 ), c(0,0), c(1,0) )
+ ll.b <- rbind( c(0,4/ss), c(0,2/ss), c( -1,0 ), c(0,0), c(1,0) )
 
  # wedgee
- ll.c <- rbind( c(-1,-1/2), c(1,-1/2), c(0, 3/ss), c(0,2/ss), c( 0,1/ss ) )
+ ll.c <- rbind( c(-1,-1/2), c(1,-1/2), c(0, 1/ss), c(0,2/ss), c( 0,3/ss ) )
 
  # circle/star
  theta <- c( 2*pi/5, 2*2*pi/5, 3*2*pi/5, 4*2*pi/5, 2*pi )
@@ -24,6 +23,14 @@ library(igraph)
  x <- rr*cos(theta)
  y <- rr*sin(theta)
  ll.d <- cbind(x,y)
+
+ A.apollo <- matrix(0,5,5)
+ A.apollo[1,3] <- A.apollo[3,1] <- 1
+ A.apollo[1,5] <- A.apollo[5,1] <- 1
+ A.apollo[2,3] <- A.apollo[3,2] <- 1
+ A.apollo[2,4] <- A.apollo[4,2] <- 1
+ A.apollo[2,5] <- A.apollo[5,2] <- 1
+ g.apollo <- graph.adjacency(A.apollo)
 
  ## quincunx
  ll.e <- rbind( c(0,0), c(-1,1), c(-1,-1), c(1,-1), c(1,1) )
@@ -54,13 +61,24 @@ library(igraph)
 	vertex.label.cex=3, vertex.size=45 )
  dev.off()
 
+ pdf( file="5b-passes.pdf" )
+ par( mgp=rep(1,3) )
+ plot(g.apollo,  layout=ll.b, xlim=c(-1.2,1.2), ylim=c(-.2,3.2),
+	edge.arrow.width=0, edge.width=3, vertex.label=c("A","B","C","D", "E"),
+	edge.color="black" , rescale=FALSE, vertex.color="grey",
+	vertex.label.cex=3, vertex.size=45 )
+ dev.off()
+
+
+
+
  # wedgee
  pdf( file="5c.pdf" )
  par( mgp=rep(1,3) )
  plot(g,  layout=ll.c, xlim=c(-1.2,1.2), ylim=c(-1.2,3.2),
 	edge.arrow.width=0, edge.width=3, vertex.label=c("A","B","C","D", "E"),
 	edge.color="black" , rescale=FALSE, vertex.color="grey",
-	vertex.label.cex=3, vertex.size=45 )
+	vertex.label.cex=2, vertex.size=45 )
  dev.off()
 
  ## circle/star
@@ -68,7 +86,7 @@ library(igraph)
  pdf( file="5d.pdf" )
  par( mgp=rep(1,3) )
  plot(g,  layout=ll.d, xlim=c(-1.2,1.2), ylim=c(-1.2,1.2),
-	edge.arrow.width=0, edge.width=3, vertex.label=c("A","B","C","D", "E"),
+	edge.arrow.width=0, edge.width=3, vertex.label=c("A","E","D","C", "B"),
 	edge.color="black" , rescale=FALSE, vertex.color="grey",
 	vertex.label.cex=3, vertex.size=45 )
  dev.off()
