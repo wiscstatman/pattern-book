@@ -72,6 +72,7 @@ library(igraph)
 
 
 
+
  # apollo
  pdf( file="5b.pdf" )
  par( mgp=rep(1,3) )
@@ -100,6 +101,17 @@ library(igraph)
 	edge.color="black" , rescale=FALSE, vertex.color="grey",
 	vertex.label.cex=2, vertex.size=45 )
  dev.off()
+
+
+ pdf( file="5c-choc.pdf" )
+ par( mgp=rep(1,3) )
+ plot(g.choc,  layout=ll.c, xlim=c(-1.2,1.2), ylim=c(-1.2,3.2),
+        edge.arrow.width=0, edge.width=3, vertex.label=c("A","B","C","D", "E"),
+        edge.color="black" , rescale=FALSE, vertex.color="grey",
+        vertex.label.cex=3, vertex.size=45 )
+ dev.off()
+
+
 
  ## circle/star
  
