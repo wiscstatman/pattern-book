@@ -75,6 +75,22 @@ plot( g.star5,  layout=ll, vertex.size=30, edge.arrow.size=.8, edge.arrow.width=
         edge.width=2, margin=c(0,.4,0,.4), vertex.label=labs, add=TRUE , vertex.label.cex=2)
 dev.off()
 
+pdf( file="star5extra.pdf", height=6, width=6 )
+labs <- c("I", "III", "V", "II", "IV" )
+th <- c( pi/2, pi/2 - 2*pi/5 , pi/2 - 4*pi/5, pi/2 - 6*pi/5, pi/2 - 8*pi/5 )
+yy <- sin(th)
+xx <- cos(th)
+ll <- cbind( xx, yy )
+plot( g,  layout=ll, vertex.size=30, edge.arrow.size=.8, edge.arrow.width=.8,
+                 edge.lty=1, edge.color="black", vertex.color="grey",
+        edge.width=2, margin=c(0,.4,0,.4), vertex.label=labs, vertex.label.cex=2 )
+
+symbols( 0, 0, circles=1, add=TRUE , lwd=1, inches=FALSE , col="grey")
+plot( g,  layout=ll, vertex.size=30, edge.arrow.size=.8, edge.arrow.width=.8,
+                 edge.lty=1, edge.color="black", vertex.color="grey",
+        edge.width=2, margin=c(0,.4,0,.4), vertex.label=labs, add=TRUE , vertex.label.cex=2)
+dev.off()
+
 
 
 
