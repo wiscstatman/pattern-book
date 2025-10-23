@@ -36,8 +36,7 @@ ll <- rbind( c(-1,0),
         c( -1, -1.6*.866/3) )
 
 
-#pdf( file="ivypi.pdf", height=5, width=5 )
-pdf( file="ivypi-2.pdf", height=5, width=5 )
+#pdf( file="ivypi-2.pdf", height=5, width=5 )
 par( mar=rep(1/2,4)  )
 plot( g, layout=ll , 
 	vertex.size=15, edge.arrow.size=1/2, edge.arrow.width=2, 
@@ -54,7 +53,8 @@ plot( g, layout=ll ,
 		 edge.lty=1, edge.color="black", 
 		edge.width=4, vertex.color="grey", margin=c(0,.4,0,.4), asp=0,
 		rescale=FALSE, add=TRUE )
-dev.off()
+
+#dev.off()
 
 A2 <- matrix(0, 10, 10 ) ## 10 positions
 A2[1,7] <- 1; A2[7,1] <- 1
@@ -63,7 +63,7 @@ A2[4,8] <- 1; A2[8,4] <- 1
 A2[3,9] <- 1; A2[9,3] <- 1
 g2 <- graph.adjacency(A2)
 
-pdf( file="ivypi-pass-2.pdf", height=5, width=5 )
+#pdf( file="ivypi-pass-2.pdf", height=5, width=5 )
 par( mar=rep(2,4)  )
 plot( g2, layout=ll ,
         vertex.size=18, edge.arrow.size=1/2, edge.arrow.width=2,
@@ -77,5 +77,6 @@ plot( g2, layout=ll ,
         vertex.size=18, edge.arrow.size=1/2, edge.arrow.width=1.8,
                  edge.lty=1, edge.color="black",
                 edge.width=3, vertex.color="grey", margin=c(0,2,0,2), asp=0,
-                rescale=FALSE, add=TRUE )
-dev.off()
+                rescale=FALSE, add=TRUE, xlim=c(-1.5,1.5), keep_aspect_ratio=TRUE )
+box()
+#dev.off()
