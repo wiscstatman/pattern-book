@@ -1,0 +1,131 @@
+
+orwarding  to your personal email too.
+
+On Thu, Nov 6, 2025 at 9:33 AM Nathan Nard <nnard1616@gmail.com> wrote:
+
+    Here's the email thread where we discussed a 5 person laxative.  There's two different versions.  One where everyone crosses, and one where just one person crosses while everyone shifts over along the dodecagon.  The former has everyone passing to the same person each time, while the latter is slightly easier movement-wise.
+
+    Let me know if you need clarification on anything!
+
+    On Tue, Feb 15, 2022 at 8:58 AM MICHAEL A NEWTON <newton@stat.wisc.edu> wrote:
+
+        Hey Nathan,
+
+        You've out-mathed the math geeks!!
+        The two-rhombus version looks like a weave...the three-rhombus one might be interesting!
+
+        thanks!
+        -Mike
+
+
+        Professor and Chair of Biostatistics and Medical Informatics
+        Professor of Statistics
+        www.stat.wisc.edu/~newton/
+        From: nnard1616@gmail.com <nnard1616@gmail.com>
+        Sent: Monday, February 14, 2022 9:04 PM
+        To: MICHAEL A NEWTON <newton@stat.wisc.edu>
+        Cc: mark@markhayward.net <mark@markhayward.net>; Mel The Juggler <melllonhead@sbcglobal.net>; nick aikens <naikens@gmail.com>
+        Subject: Re: 5 Person Laxative
+         
+        An interesting insight: I've come to realize the movements are essentially the application of the reflection transformation matrix on our pentagonal formation in alternating bases (red axes and blue axes below):
+        image.png
+
+
+
+Maybe having the two sets of axes in different colors on the floor might be helpful for remembering where to move?  IE, after a right hand pass, we all move across the red x axis, and after a left hand pass we all move across the blue x axis.
+
+Additionally, I've generalized this sort of pattern to X jugglers.  Here are the moving patterns for 2 (trivial) to 7 jugglers
+image.png
+
+Passing patterns can be any pattern that works in a traditional circular distribution of jugglers with 3X clubs (I believe).
+
+Interestingly these movement patterns trace out colinear proportional rhombi.  Notice that the smallest rhombi get really small as X increases.  This suggests the pattern will likely not be feasible with an arbitrarily large number of jugglers for those on the small rhombi will be colliding with each other.  But then again, these are ideal models. In practice jugglers will be moving non-ideally.  So the only real way to see if larger patterns can work is to try them.
+
+Another interesting tidbit I'd like to point out is the number of rhombi increases by 1 as X increases.  Further, there's some symmetry among the rhombi.  EG, for the X = 4 pattern there are two equally sized rhombi on the ends, with one larger central rhombus.  This vaguely suggests a relation to Pascal's Triangle:
+image.png
+
+much like how H NMR peak height splits are related to Pascal's Triangle.  Upon initial inspection, it almost looks like there is a direct relation.  The relative areas of the rhombi for X = 2, 3, 4 follow Pascal's Triangle:
+image.png
+
+(Note, these are ratios, not exact areas)
+
+But much like how 2 + 2 = 2 ^ 2 does not imply X + X = X ^ 2 for all X, turns out this is just coincidental.  Looking at the next pattern (X = 5) we get a different outcome:
+image.png
+
+But upon further investigation another interesting relation can be seen:
+image.png
+
+The above computes the relative rhombi areas as compared to the smallest rhombus for each pattern size up to 29 jugglers.  Listed in order from smallest rhombus to largest rhombus.  
+
+It turns out every relative rhombus size converges to a square number.  The smallest rhombus relative size is trivially self-evident: 1.  The next smallest rhombus relative size converges to 4 (IE, is 4 times the area of the smallest rhombus), then the next converges to 9, then 16, and so on.
+
+I've been able to develop a geometrical interpretation to explain why this occurs.  But I leave this as an exercise for the class.  Perhaps you'll come up with a different explanation as to why the above relation exists.
+
+Thanks for coming to my TED talk.  I would appreciate any comments/questions you may have about the above.  See you Thursday.
+
+
+On Mon, Feb 14, 2022 at 10:30 AM MICHAEL A NEWTON <newton@stat.wisc.edu> wrote:
+
+    but of course...how could we not see this!!
+
+    Let's try it next time.   I'll bring some painter's tape for the floor!
+
+    Thanks Nathan
+    -Mike
+
+
+    Professor and Chair of Biostatistics and Medical Informatics
+    Professor of Statistics
+    www.stat.wisc.edu/~newton/
+    From: nnard1616@gmail.com <nnard1616@gmail.com>
+    Sent: Sunday, February 13, 2022 7:31 PM
+    To: MICHAEL A NEWTON <newton@stat.wisc.edu>
+    Cc: mark@markhayward.net <mark@markhayward.net>; Mel The Juggler <melllonhead@sbcglobal.net>; nick aikens <naikens@gmail.com>
+    Subject: Re: 5 Person Laxative
+     
+    Peter (what's his email?) made a good observation today, we should have three people cross at the same time. This way, everyone will pass to the same person:
+    5j.png
+
+
+Black arrows are movements, red arrows are right hand passes, blue arrows are left hand passes.  Read left to right, top to bottom.  Notice the passing arrows have the same connectivity throughout.  EG, Red Juggler always passes to Blue Juggler.   Passing will be easier to remember this way, but movements will be more challenging.  Here's the order of movements for Red Juggler:
+5j_movements.png
+
+Everyone else does the same, but starts at different positions.  Once we get the movements down, I think this will indeed feel like a laxative.
+
+On Fri, Feb 11, 2022 at 9:34 AM MICHAEL A NEWTON <newton@stat.wisc.edu> wrote:
+
+    This is wonderful Nate.
+    I had not seen the polygon business before!
+
+    Now the passing overlay is going to be interesting; we won't obviously be able to "always pass to the same person", as in the 3 person laxative.  We need to figure out this "extra strength laxative"!
+
+    thanks
+    -Mike
+
+
+    Professor and Chair of Biostatistics and Medical Informatics
+    Professor of Statistics
+    www.stat.wisc.edu/~newton/
+    From: mark@markhayward.net <mark@markhayward.net>
+    Sent: Friday, February 11, 2022 9:26 AM
+    To: Nathan Nard <nnard1616@gmail.com>
+    Cc: Mel The Juggler <melllonhead@sbcglobal.net>; MICHAEL A NEWTON <newton@stat.wisc.edu>; nick aikens <naikens@gmail.com>
+    Subject: Re: 5 Person Laxative
+     
+    This looks awesome! I can't wait to try it! I feel a little bad for all the shit we were giving you when you were talking about "sitting down to work things out"... but only a little. It shouldn't stop me from dishing it out next time, don't worry.
+
+    On Fri, Feb 11, 2022 at 12:48 AM Nathan Nard <nnard1616@gmail.com> wrote:
+
+        I don't remember all of the details for the laxative (passing count, who passes to who) but I do recall that the positions and transitions roughly trace out the points in a regular hexagon:
+        3j.png
+
+
+
+For a 5 person laxative, instead of a regular hexagon it would be a regular decagon:
+5j.png
+
+
+
+    So when a juggler transitions, the two jugglers closest to the destination need to dilate out and the other two jugglers need to contract in towards the median and away from the transitioning juggler.  Or at least I think that's what needs to happen.  Let me know if I missed anything.
+
+
