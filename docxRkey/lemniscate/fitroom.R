@@ -108,12 +108,13 @@ yyright[quad ==1 | quad == 3] <- tmpy[quad ==1 | quad==3]
 
 
 
-plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl, asp=1 )
-lines( xxleft, yyleft, col="red", lwd=2 )
-lines( xxright, yyright, col="blue", lwd=2 )
+#plot( x0, y0, type="l", col="grey",  axes=FALSE , xlab="", ylab="", xlim=xl, ylim=yl, asp=1 )
+#lines( xxleft, yyleft, col="red", lwd=2 )
+#lines( xxright, yyright, col="blue", lwd=2 )
 
 
-theta <- -atan( 35/48 )  ## angle of room diagonal
+#theta <- -atan( 35/48 )  ## angle of room diagonal
+theta <- 0
 
 p0 <- cbind(x0,y0)
 pp <- p0 %*% rbind(  c( cos(theta), -sin(theta) ), c( sin(theta), cos(theta) ) )
