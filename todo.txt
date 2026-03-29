@@ -183,3 +183,7 @@ Later me, Nick, Steve, and Mark did 14-club box on 3-count, which was pretty coo
 1's are on 4 count, one side even one side odd. ...Nickname "Palendrome"
 
 me Mel, Peter and Steve also do my new 4-person laxative on 6 count, with pass-on-the-right-moving rules
+
+## March 29/26...yesterday I worked out the combinatorial double weave in V4, and today I thought moves could also follow
+	circle.  It turns out no, but we do get a new "two circles" synchronous pattern that's in the family of 2pi/3 and
+		knots and the like
