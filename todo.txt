@@ -225,3 +225,21 @@ April 26/2026 ... Sunday
 	beats on the change side, and then immediately slide to the other side, giving it a lot of motion compared to other patterns
 
 	Luke, Josh, and I talk about how could AI help us with documenting!
+
+May 24/2026...Sunday
+
+	I was imagining taking a 2pi/3, making the loops relatively big by slowing down the count, and then adding
+	two stationary jugglers as in eye-of-the-needle...We tried one variation with me, Mark, Mel, Chan, and Tony
+	...I propose to call it "Eye of Buffon's Needle", considering the connection to pi.  Set up 2 v 3
+        I start on the 2-line, on Tony's left, and this spot sees 2 passes (say everything is on 6 count)
+        I pass to Mark, who's opposite me on the 3-line, at the edge of the pattern, and Mel, on the opposite end of 
+	the 3-line passes to Tony. Chan, in the middle of the 3-line, is on a self.  Then Mark runs diagonally through the
+       middle to get to the other side of Tony, so now the 2 v 3 has turned into 3 v 2.   Meanwhile, while Mark crosses
+       over, Mel runs behind Chan into Mark's former position, and passes to me on beat 2, while Mark turns around and passes
+	to Chan on beat 2, with now Tony on self.  Next I run diagonally across to Chan's left, and Mark slides across to my
+ 	spot on Tony's left.  Mel passes to Mark, I pass back to Tony, and Chan's on a self.   The pattern continues
+	Note there are 6 spots in 3-v-3, with one corner empty, with centers (Tony and Chan) stationary, and with movers
+        on the corners who do two passes on the sticky side of the pattern before moving and just one pass on the slippery side!
+	It can also be viewed from the 2pi/3 perspective, in which the six in-motion spots are collapsed so that each loop of three
+	has one double spot and one single spot. Cool and fun, and only a 6 beat cycle!
+    
