@@ -1,0 +1,12 @@
+
+1,3,5 on 7 4 leaf clover; Nathan to me, Mel, Chan, and Mark on June 8, 2026
+
+Here's the piano roll for the 1,3,5 on 7 Four Leaf Clover.  It's big.
+
+Details:
+
+    There are exactly 3 types of petals, two that are 23 juggling beats long and one that is 24 juggling beats.  Every juggler cycles through these three types every 70 (23 + 23 + 24 = 70) juggling beats.
+    Each petal has exactly 10 passing beats
+    It takes 420 juggling beats, 180 passing beats, for the clubs to return to their starting positions.  But if you do the math, the jugglers won't be in their starting orientation.  The clover will be flipped 180 degrees.  So to get all of the clubs and all of the jugglers back to their starting positions we must juggle for 840 juggling beats, which comes out to 360 passing beats.  Each juggler would have to make 144 passes each.
+    If we were to juggle perfectly to completion at about 120 beats per minute, we would be juggling nonstop for 7 minutes.
+
