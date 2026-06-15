@@ -2,3 +2,9 @@
 This is current version of the Google doc version upgrade
 
 Pushed to github on May 7, 2025 for first time.
+
+In June 2026, I split the file into two parts, since at over 200 pages
+the buffering time with google docs was too long.   See in old *lastsingle*
+for version just before the split.
+
+Now Part 1 goes through Chapter 5; and Part 6 starts with 6 person patterns
