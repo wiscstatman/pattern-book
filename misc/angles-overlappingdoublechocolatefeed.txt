@@ -1,0 +1,229 @@
+```python
+import numpy as np
+
+# Line 1 (ABC): 3 points, spaced by 0.5. Let's center at x = [0, 0.5, 1.0] or similar.
+# Let's assume ABC span from 0 to 1: A=(0,0), B=(0.5,0), C=(1.0,0)
+# DEFG: 4 points, spaced by 0.5. Span from -0.25 to 1.25 if centered, or 0 to 1.5.
+# Let's test centered alignment:
+A = np.array([0.0, 0.0])
+B = np.array([0.5, 0.0])
+C = np.array([1.0, 0.0])
+abc = [A, B, C]
+abc_names = ['A', 'B', 'C']
+
+# DEFG: 4 points, distance between lines = 1.0.
+# If centered relative to ABC (span 0 to 1, midpoint 0.5; DEFG span 1.5, midpoint 0.5):
+# D = ( -0.25, 1.0 ), E = ( 0.25, 1.0 ), F = ( 0.75, 1.0 ), G = ( 1.25, 1.0 )
+# Or let's check if DEFG starts at x=0: D=(0,1), E=(0.5,1), F=(1.0,1), G=(1.5,1)
+# Let's write a function to compute angle given vertex P and two points Q, R.
+def angle(p, q, r):
+    pq = q - p
+    pr = r - p
+    cos_theta = np.dot(pq, pr) / (np.linalg.norm(pq) * np.linalg.norm(pr))
+    cos_theta = np.clip(cos_theta, -1.0, 1.0)
+    return np.arccos(cos_theta)
+
+# Let's evaluate for both centered and left-aligned (D aligned with A)
+print("--- Centered Alignment ---")
+def run_simulation(defg_x):
+    defg = [np.array([x, 1.0]) for x in defg_x]
+    defg_names = ['D', 'E', 'F', 'G']
+    
+    results = []
+    # Vertex on ABC, pair on DEFG
+    for i, p in enumerate(abc):
+        p_name = abc_names[i]
+        for q_idx in range(len(defg)):
+            for r_idx in range(q_idx + 1, len(defg)):
+                q = defg[q_idx]
+                r = defg[r_idx]
+                ang = angle(p, q, r)
+                results.append((p_name, defg_names[q_idx], defg_names[r_idx], ang))
+                
+    # Vertex on DEFG, pair on ABC
+    for i, p in enumerate(defg):
+        p_name = defg_names[i]
+        for q_idx in range(len(abc)):
+            for r_idx in range(q_idx + 1, len(abc)):
+                q = abc[q_idx]
+                r = abc[r_idx]
+                ang = angle(p, q, r)
+                results.append((p_name, abc_names[q_idx], abc_names[r_idx], ang))
+                
+    return results
+
+# Centered: DEFG centered over ABC
+# ABC span: 0 to 1 (mid 0.5). DEFG span: width 1.5. Center at 0.5 -> -0.25 to 1.25
+res_centered = run_simulation([-0.25, 0.25, 0.75, 1.25])
+for r in res_centered[:6]:
+    print(f"Vertex {r[0]} with {r[1]}, {r[2]}: {r[3]:.4f} rad ({np.degrees(r[3]):.2f} deg)")
+
+
+```
+
+```text
+--- Centered Alignment ---
+Vertex A with D, E: 0.4900 rad (28.07 deg)
+Vertex A with D, F: 0.8885 rad (50.91 deg)
+Vertex A with D, G: 1.1410 rad (65.38 deg)
+Vertex A with E, F: 0.3985 rad (22.83 deg)
+Vertex A with E, G: 0.6511 rad (37.30 deg)
+Vertex A with F, G: 0.2526 rad (14.47 deg)
+
+
+```
+
+```python
+import numpy as np
+
+# Let's set up the coordinates precisely.
+# Distance between points = 0.5. Distance between lines = 1.0.
+# Let's assume line 1 (ABC) is at y = 0, with x coordinates: A = 0, B = 0.5, C = 1.0.
+# Line 2 (DEFG) is at y = 1.0. 
+# How are D, E, F, G positioned horizontally relative to A, B, C?
+# Let's consider two natural alignments:
+# Alignment 1: D aligns vertically with A (left-aligned) -> D=0, E=0.5, F=1.0, G=1.5
+# Alignment 2: Centered -> Midpoint of ABC is 0.5, midpoint of DEFG is (0+1.5)/2 = 0.75? No, DEFG has 4 points (0, 0.5, 1.0, 1.5), length 1.5. Midpoint is 0.75. ABC length 1.0, midpoint 0.5.
+# Let's check if D aligns with A or if they are symmetric. Let's provide the calculation for both or the most standard one (e.g. D aligned with A, or centered). Let's calculate Alignment 1 (D, E, F, G starting at x=0).
+
+def compute_table(defg_x):
+    abc = [np.array([0.0, 0.0]), np.array([0.5, 0.0]), np.array([1.0, 0.0])]
+    abc_names = ['A', 'B', 'C']
+    defg = [np.array([x, 1.0]) for x in defg_x]
+    defg_names = ['D', 'E', 'F', 'G']
+    
+    # 1. Vertex on ABC, pair on DEFG
+    print("--- Vertex on ABC, Pair on DEFG ---")
+    for i, p in enumerate(abc):
+        p_name = abc_names[i]
+        for q_idx in range(len(defg)):
+            for r_idx in range(q_idx + 1, len(defg)):
+                q = defg[q_idx]
+                r = defg[r_idx]
+                pq = q - p
+                pr = r - p
+                cos_theta = np.dot(pq, pr) / (np.linalg.norm(pq) * np.linalg.norm(pr))
+                ang = np.arccos(np.clip(cos_theta, -1.0, 1.0))
+                print(f"Vertex {p_name} & Pair ({defg_names[q_idx]}, {defg_names[r_idx]}): {ang:.5f} rad ({np.degrees(ang):.2f}°)")
+
+    # 2. Vertex on DEFG, pair on ABC
+    print("\n--- Vertex on DEFG, Pair on ABC ---")
+    for i, p in enumerate(defg):
+        p_name = defg_names[i]
+        for q_idx in range(len(abc)):
+            for r_idx in range(q_idx + 1, len(abc)):
+                q = abc[q_idx]
+                r = abc[r_idx]
+                pq = q - p
+                pr = r - p
+                cos_theta = np.dot(pq, pr) / (np.linalg.norm(pq) * np.linalg.norm(pr))
+                ang = np.arccos(np.clip(cos_theta, -1.0, 1.0))
+                print(f"Vertex {p_name} & Pair ({abc_names[q_idx]}, {abc_names[r_idx]}): {ang:.5f} rad ({np.degrees(ang):.2f}°)")
+
+print("=== Alignment: D aligned with A (x = 0, 0.5, 1.0, 1.5) ===")
+compute_table([0.0, 0.5, 1.0, 1.5])
+
+
+```
+
+```text
+=== Alignment: D aligned with A (x = 0, 0.5, 1.0, 1.5) ===
+--- Vertex on ABC, Pair on DEFG ---
+Vertex A & Pair (D, E): 0.46365 rad (26.57°)
+Vertex A & Pair (D, F): 0.78540 rad (45.00°)
+Vertex A & Pair (D, G): 0.98279 rad (56.31°)
+Vertex A & Pair (E, F): 0.32175 rad (18.43°)
+Vertex A & Pair (E, G): 0.51915 rad (29.74°)
+Vertex A & Pair (F, G): 0.19740 rad (11.31°)
+Vertex B & Pair (D, E): 0.46365 rad (26.57°)
+Vertex B & Pair (D, F): 0.92730 rad (53.13°)
+Vertex B & Pair (D, G): 1.24905 rad (71.57°)
+Vertex B & Pair (E, F): 0.46365 rad (26.57°)
+Vertex B & Pair (E, G): 0.78540 rad (45.00°)
+Vertex B & Pair (F, G): 0.32175 rad (18.43°)
+Vertex C & Pair (D, E): 0.32175 rad (18.43°)
+Vertex C & Pair (D, F): 0.78540 rad (45.00°)
+Vertex C & Pair (D, G): 1.24905 rad (71.57°)
+Vertex C & Pair (E, F): 0.46365 rad (26.57°)
+Vertex C & Pair (E, G): 0.92730 rad (53.13°)
+Vertex C & Pair (F, G): 0.46365 rad (26.57°)
+
+--- Vertex on DEFG, Pair on ABC ---
+Vertex D & Pair (A, B): 0.46365 rad (26.57°)
+Vertex D & Pair (A, C): 0.78540 rad (45.00°)
+Vertex D & Pair (B, C): 0.32175 rad (18.43°)
+Vertex E & Pair (A, B): 0.46365 rad (26.57°)
+Vertex E & Pair (A, C): 0.92730 rad (53.13°)
+Vertex E & Pair (B, C): 0.46365 rad (26.57°)
+Vertex F & Pair (A, B): 0.32175 rad (18.43°)
+Vertex F & Pair (A, C): 0.78540 rad (45.00°)
+Vertex F & Pair (B, C): 0.46365 rad (26.57°)
+Vertex G & Pair (A, B): 0.19740 rad (11.31°)
+Vertex G & Pair (A, C): 0.51915 rad (29.74°)
+Vertex G & Pair (B, C): 0.32175 rad (18.43°)
+
+
+```
+
+To tabulate the angles, let's establish a standard Cartesian coordinate system based on your description:
+
+* **Line 1 (ABC):** Three points equally spaced by $0.5$ units. Let's set $A = (0, 0)$, $B = (0.5, 0)$, and $C = (1.0, 0)$.
+* **Line 2 (DEFG):** Four points equally spaced by $0.5$ units, located $1.0$ unit away (twice the inter-point distance). Aligning the start of both lines gives $D = (0, 1)$, $E = (0.5, 1)$, $F = (1.0, 1)$, and $G = (1.5, 1)$.
+
+An angle formed at vertex $P$ subtended by points $Q$ and $R$ is calculated via the dot product of vectors $\vec{PQ}$ and $\vec{PR}$:
+
+
+$$\theta = \arccos\left(\frac{\vec{PQ} \cdot \vec{PR}}{\Vert{}\vec{PQ}\Vert{} \Vert{}\vec{PR}\Vert{}}\right)$$
+
+---
+
+### Table 1: Vertex on Line ABC, Pair on Line DEFG
+
+| Vertex $P$ | Point Pair $(Q, R)$ | Radians | Degrees |
+| --- | --- | --- | --- |
+| **A** | $(D, E)$ | $0.4637$ | $26.57^\circ$ |
+|  | $(D, F)$ | $0.7854$ | $45.00^\circ$ |
+|  | $(D, G)$ | $0.9828$ | $56.31^\circ$ |
+|  | $(E, F)$ | $0.3218$ | $18.43^\circ$ |
+|  | $(E, G)$ | $0.5192$ | $29.74^\circ$ |
+|  | $(F, G)$ | $0.1974$ | $11.31^\circ$ |
+| **B** | $(D, E)$ | $0.4637$ | $26.57^\circ$ |
+|  | $(D, F)$ | $0.9273$ | $53.13^\circ$ |
+|  | $(D, G)$ | $1.2491$ | $71.57^\circ$ |
+|  | $(E, F)$ | $0.4637$ | $26.57^\circ$ |
+|  | $(E, G)$ | $0.7854$ | $45.00^\circ$ |
+|  | $(F, G)$ | $0.3218$ | $18.43^\circ$ |
+| **C** | $(D, E)$ | $0.3218$ | $18.43^\circ$ |
+|  | $(D, F)$ | $0.7854$ | $45.00^\circ$ |
+|  | $(D, G)$ | $1.2491$ | $71.57^\circ$ |
+|  | $(E, F)$ | $0.4637$ | $26.57^\circ$ |
+|  | $(E, G)$ | $0.9273$ | $53.13^\circ$ |
+|  | $(F, G)$ | $0.4637$ | $26.57^\circ$ |
+
+---
+
+### Table 2: Vertex on Line DEFG, Pair on Line ABC
+
+| Vertex $P$ | Point Pair $(Q, R)$ | Radians | Degrees |
+| --- | --- | --- | --- |
+| **D** | $(A, B)$ | $0.4637$ | $26.57^\circ$ |
+|  | $(A, C)$ | $0.7854$ | $45.00^\circ$ |
+|  | $(B, C)$ | $0.3218$ | $18.43^\circ$ |
+| **E** | $(A, B)$ | $0.4637$ | $26.57^\circ$ |
+|  | $(A, C)$ | $0.9273$ | $53.13^\circ$ |
+|  | $(B, C)$ | $0.4637$ | $26.57^\circ$ |
+| **F** | $(A, B)$ | $0.3218$ | $18.43^\circ$ |
+|  | $(A, C)$ | $0.7854$ | $45.00^\circ$ |
+|  | $(B, C)$ | $0.4637$ | $26.57^\circ$ |
+| **G** | $(A, B)$ | $0.1974$ | $11.31^\circ$ |
+|  | $(A, C)$ | $0.5192$ | $29.74^\circ$ |
+|  | $(B, C)$ | $0.3218$ | $18.43^\circ$ |
+
+---
+
+### Analytical Insights
+
+Due to the symmetry of the grid:
+
+* Angles subtended by point pairs separated by $0.5$ units typically resolve to $\arctan(0.5) \approx 0.4637\text{ rad}$ ($26.57^\circ$) or $\arctan(0.25) \approx 0.1974\text{ rad}$ ($11.31^\circ$).
+* Pairs spanning $1.0$ unit often yield standard reference angles like $\arctan(1) = \pi/4 \approx 0.7854\text{ rad}$ ($45^\circ$).
