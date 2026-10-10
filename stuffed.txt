@@ -1,0 +1,19 @@
+I seek a graphic showing 3 concentric rings. Each is like a donut.  Each has 12 segments, as in the face on ordinary clock.  
+Each of the 12 segments is like a trapezoid, except for the titch of curvature.  All the segments have identical shape.  They differ only
+in their orientation and placement. They are placed to form a ring.  The three rings are distinguished not only by their radii, but also by
+the specific pattern of grey/white shading of the segments.  Labeling segments, 1,2,...,12 within each
+ring, the middle ring has grey shading in segments (2,3,4,5,8,9,10,11); the inner ring has grey shading
+in segments (4,5,6,7,10,11,12,1), and the outer ring has grey shading in segments (6,7,8,9,12,1,2,3).
+Build this three-ring graphic in steps.   
+
+
+You are an expert in geometry. Many important designs are relying on you to get this right, so please concentrate and double check everything. I will walk you through the task with step-by-step instructions.
+
+1. Make one ring with 12 equal segments.  Shade in grey segments (4,5,6,7,10,11,12,1).
+
+
+make a donut shaped ring, partitioned into 12 regular segments.  Present it in plan view, rendered simply with no shadow effects.
+make the inner donut hole relatively large.  
+
+notice that the shape is defined by two circles, and outer and an inner.  render the picture so that the ratio of outer to inner radii
+is 1.2.
