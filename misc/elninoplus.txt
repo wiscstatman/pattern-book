@@ -1,0 +1,29 @@
+From Luke to group, Oct 5, 2026
+
+Hi  Steve, et. al.,
+
+Thanks for the awesome juggling on Sunday. I have accepted your challenge. Here is my proposed version of the El Niño Plus.
+
+http://142.93.1.168:8889/passist/maj?p=el-nino-plus
+
+The pattern book has a different half-way built pattern called El Niño Plus by Graham, but I don't think that version quite captures the je ne sais quoi of the original pattern, and it's also different from the version we tried on Sunday.
+
+The 4 feeding passes are all crossing double passes in 1-count. All feedee passes are straight singles. Note that the feeder throws 6 passes in a row: straight single, the 4 doubles in the feed, and then a final single to switch the feeder. The beat where the feeders switch is actually a triangle pass... It's 9 passes out of 16 beats for all 4 jugglers.
+
+It's a tough pattern, but I think we could run it... Sunday?
+
+Juggler / beat	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16
+AR	Dx-C	Dx-D	Dx-B	Dx-C	B		B			C			C			D
+BR	D			A	Dx-D	Dx-A	Dx-C	Dx-D	C		C			D		
+CR		A			A			B	Dx-A	Dx-B	Dx-D	Dx-A	D		D	
+DR	A		A			B			B			C	Dx-B	Dx-C	Dx-A	Dx-B
+C single pass to C · D-C / T-C double / triple · x crossing (right to right) · blank = self · D-self double self · – pause. R/L = hand of each juggler's first throw. Hover a cell for details.
+
+
+Last night I also added animations for the Mango Swirl and the classic El Niño, for fun.
+
+http://142.93.1.168:8889/passist/maj?p=mango-swirl
+http://142.93.1.168:8889/passist/maj?p=el-nino
+
+Cheers,
+
