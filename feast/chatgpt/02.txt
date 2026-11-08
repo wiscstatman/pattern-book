@@ -1,0 +1,447 @@
+
+# trying radially symmetric version:
+
+### MAN
+revisiting the feast juggling pattern, I have an additional constraint to impose on the local trace trajectories of each juggler.    I would have expected, but it's not apparent in the solutions so far, that there would a sort of radial symmetry in the local trace.   I'm not sure it's necessary or possible, but I'm curious if that constraint can be imposed.  If you consider a ray emanating from the pattern center through a juggler's home base, then I would expect the trace to be symmetric about that ray.  Can you create code for and a .gif animation for the n=20 case with smoothing and longer throws as in prior versions?
+
+##
+
+## MAN
+
+hmm, that doesn't work very well. To help you, I'm attaching some code prepared previously for the version that did not force radial symmetry.   The snakelike motion in the former version is what is capturing the real dyanmics, but that's not produced in your new draft.
+
+#
+You're right. The earlier FEAST model's snakelike motion is essential, and my elliptical construction replaced the dynamics rather than preserving them.
+
+I've now rebuilt the 20-person model using the optimization described in your report, with radial mirror symmetry imposed on the master trace itself.
+
+## Revised FEAST — optimized with radial symmetry
+
+The new solution recovers the interwoven, snakelike traces and retains the original two-beat phase shifts, passing relationships, smooth interpolation, and personal-space collision penalties.
+
+Here are the numerical results:
+
+| Measure                    | Revised solution |
+| -------------------------- | ---------------- |
+| Jugglers                   | 20               |
+| Longest pass               | 10.07 ft         |
+| Mean pass                  | 9.63 ft          |
+| Walking distance per cycle | 59.41 ft         |
+| Largest step between beats | 4.29 ft          |
+| Minimum sampled separation | 6.17 ft          |
+| Radial reflection error    | Essentially zero |
+
+The particularly encouraging result is that exact local reflection symmetry is possible without eliminating the characteristic snakelike motion.
+
+## Download the revised files
+
+Animated FEAST — 20 jugglers
+
+80-frame looping GIF showing the optimized motion and passing partners.
+
+Complete Python optimization code
+
+Runnable SciPy optimization with reflection symmetry, periodic cubic splines, and collision penalties.
+
+Optimized master trace coordinates
+
+
+
+
+Radial and tangential coordinates for all 20 passing beats.
+
+## Comparison with the previous solution
+
+Your previous 10-foot-threshold solution achieved 55.65 feet of walking per cycle, with a longest pass of 11.11 feet.
+
+The new reflection-constrained solution requires 59.41 feet of walking, approximately 6.8% more, but its longest pass is only 10.07 feet.
+
+That comparison is not yet perfectly controlled, because the original optimization's exact penalty weights weren't included in the report. Nevertheless, it suggests that radial symmetry may be practical rather than prohibitively expensive.
+
+The important advance is that symmetry is now a constraint on an optimized FEAST trace, not a substitute for the optimization. This is much closer to the problem you originally posed.
+
+##
+
+You're correct that neighboring jugglers are offset by one beat in their passing sequences. My reference to a two-beat phase shift was about the spatial trajectories, not the passing sequences. I should have made that distinction clear.
+
+In your earlier FEAST model, the passing rule is
+
+\\[ j(i,t)=1+((t-i)\bmod n). \\]
+
+Increasing the juggler index \\(i\\) by one shifts the partner sequence by one beat.
+
+However, the master-trace formula in your report is
+
+\\[ \mathbf{x}\_i(t)= R\left(-\frac{2\pi(i-1)}{n}\right) \mathbf q\_{t-2(i-1)\bmod n}. \\]
+
+That formula uses a two-beat shift in the local trajectory of each successive juggler.
+
+Why two? Because when we rotate the entire passing arrangement one position around the circle, both members of each pair advance by one position. Since the pairing rule effectively depends on the sum of the two juggler indices, the corresponding passing beat advances by two.
+
+So the distinction is:
+
+- Passing partner sequence: one-beat offset between neighboring jugglers.
+- Rotationally equivalent spatial trajectory: two-beat offset between neighboring jugglers.
+
+The two are mathematically consistent.
+
+There is an important consequence for our symmetry experiment: imposing mirror symmetry on the master trace must preserve that two-beat spatial phase relationship while allowing the one-beat progression of passing partners.
+
+Your intuition about the one-beat offset is correct. The two-beat term is a consequence of the rotational symmetry reduction, not an alteration of the FEAST passing order.
+
+##
+Well, another way to consider the symmetry constraint is to think that a viewer would be unable to tell whether the recording is playing forward or backward in time.  Of course, the jugglers have decided in the current version to pass clockwise around the circle; but they could equally have decided to do their passing counterclockwise.   If performed exquisitely, it seems there's no reason for shape of the trajectory to depend on the choice of overall pattern direction.
+
+##
+
+I think this is a much more illuminating way to formulate the symmetry constraint. In fact, it suggests that we should regard symmetry not as an arbitrary geometric restriction, but as a consequence of the time-reversal symmetry of the underlying FEAST problem.
+
+There is, however, one subtle distinction worth exploring.
+
+## 1. Clockwise and counterclockwise FEAST should be equivalent
+
+Suppose we have a perfectly optimized clockwise FEAST. Now imagine performing the same pattern counterclockwise.
+
+There is no intrinsic reason for either direction to be preferable. The distances between jugglers, their available personal space, their walking costs, and the permissible throw lengths are all independent of the choice of direction.
+
+Consequently, if we reflect the clockwise solution across a diameter of the circle and reverse its temporal progression, we should obtain an equally good counterclockwise solution.
+
+Mathematically, this is a form of reflection–time-reversal symmetry.
+
+## 2. What does this imply for an individual trace?
+
+Let \\(u(t)\\) be a juggler's radial coordinate and \\(v(t)\\) their tangential coordinate relative to their home-base radial axis.
+
+Your proposed symmetry can be expressed as
+
+\\[ \boxed{ u(-t)=u(t),\qquad v(-t)=-v(t). } \\]
+
+In other words, radial motion is even in time, while tangential motion is odd.
+
+This produces exactly the property you have in mind: reversing the animation in time and reflecting it across the appropriate radial axis reproduces the original movement.
+
+Importantly, this does not require an elliptical trace. It permits the complicated snakelike curves that emerged from our original optimization.
+
+And it is compatible with the two-beat spatial phase shifts in our single-master-trace model.
+
+## 3. There's an important mathematical subtlety
+
+The equivalence of clockwise and counterclockwise patterns does not, by itself, guarantee that the optimal clockwise trajectory will be mirror-symmetric.
+
+It guarantees that for every clockwise solution, there is an equally good reflected, counterclockwise solution.
+
+These could be two distinct solutions, each geometrically asymmetric.
+
+This phenomenon is called spontaneous symmetry breaking: the optimization problem possesses a symmetry that an individual optimum need not exhibit.
+
+On the other hand, if the optimal master trace were unique (after fixing the arbitrary time origin and rotational orientation), then the reflection–time-reversal symmetry would force it to satisfy your proposed condition.
+
+That is a particularly interesting possibility.
+
+## 4. This changes how I think we should optimize FEAST
+
+I would now distinguish three questions:
+
+1. Does the optimization problem respect reflection–time-reversal symmetry? It should, and we can verify that mathematically.
+2. Does the unconstrained optimum naturally possess that symmetry? This is not guaranteed, but we can investigate it numerically.
+3. If it doesn't, how much additional walking does exact symmetry require? This is the quantity our previous comparison was attempting to measure.
+
+I think we should answer the second question before insisting on the third.
+
+One especially useful experiment would be to take the optimized clockwise solution, construct its reflected time-reversed counterpart, and compare the two traces. We could then optimize from both starting points without imposing symmetry.
+
+If the resulting solutions converge to essentially the same symmetric geometry, that would be strong numerical evidence that the symmetry is a natural feature of the optimum rather than an artificial constraint.
+
+One qualification: a literal video of thrown clubs played backward would reveal reversed projectile motion. Our symmetry argument concerns the jugglers' positions and passing geometry, not the full physical motion of the clubs.
+
+## My revised interpretation
+
+Your observation suggests a stronger conjecture than the one we started with:
+
+The most efficient FEAST choreography may naturally have a mirror-symmetric local trace because the underlying passing problem has no preferred handedness.
+
+That conjecture is plausible, but not mathematically automatic.
+
+And if it turns out to be true, then our apparent 6.8% walking penalty for radial symmetry may have been largely an optimization artifact rather than a genuine cost of symmetry.
+
+I find this a more compelling direction for the next numerical experiment: don't force symmetry initially; test whether it emerges from an appropriately formulated optimization.
+
+
+### MAN
+
+Yes, I certainly appreciate that an actual video showing clubs would reveal time's direction, but as you say I'm interested the geometry over time of the jugglers and their passes. By the way, when I say "snakelike", I'm not referring to an individual trace, but rather to the emergent 'envelope' of the full set of jugglers, which exhibits this wonderful oscillation pattern over time.   The symmetry-breaking business is interesting.   I guess you're saying that yesterday's optimum, which failed to respect radial symmetry of each trace, has some associated time-reversed trace that might emerge if the jugglers proceeded counterclockwise.   That would be interesting if the overall objective function was better (lower) for a non-symmetric solution compared to a symmetric solution.  Can you check that?
+
+###
+
+## Yes — the numerical experiment supports symmetry breaking!
+
+I reran the 20-person FEAST optimization with the same objective function and penalty weights, once with radial reflection symmetry enforced and once without it.
+
+The unconstrained optimization found a substantially better solution, and its reflected, time-reversed counterpart has exactly the same objective value, to numerical precision.
+
+That is precisely the phenomenon you suggested we investigate.
+
+## 1. Results of the controlled comparison
+
+| Measure                           | Radially symmetric | Unconstrained |
+| --------------------------------- | ------------------ | ------------- |
+| Total objective value             | 481.04             | 395.85        |
+| Walking per juggler per cycle     | 59.41 ft           | 56.67 ft      |
+| Longest pass                      | 10.07 ft           | 10.08 ft      |
+| Mean pass                         | 9.63 ft            | 9.63 ft       |
+| Minimum sampled center separation | 6.17 ft            | 6.13 ft       |
+| Local mirror symmetry             | Exact              | Broken        |
+
+Optimized objective value — lower is better
+
+0150300450600Mirror-symmetricUnconstrained
+
+Same objective and weights; different symmetry constraints.
+
+The unconstrained solution improves the objective by 17.7% and reduces walking by approximately 4.6%, while keeping passing distances almost unchanged.
+
+Importantly, I initialized one unconstrained optimization at the symmetric solution itself. It remained there. But introducing even a small asymmetric perturbation led to a distinctly better configuration.
+
+This is strong numerical evidence that the symmetric solution is a stationary point that is not the preferred local minimum of the unrestricted problem.
+
+It is not a proof of global optimality.
+
+## 2. The two asymmetric solutions have identical costs
+
+Define the reflection–time-reversal operation on the master trace by
+
+\\[ \mathcal T(u_k,v_k)=(u\_{-k},-v\_{-k}), \\]
+
+with indices taken modulo 20.
+
+For the best asymmetric solution, I evaluated both the original trace and its transformed counterpart using the same objective function.
+
+Numerical reflection test
+
+Original trace
+
+# 395.854499
+
+Reflected trace
+
+# 395.854499
+
+The difference is below numerical precision at the displayed accuracy.
+
+The two traces are geometrically distinct. Their root-mean-square deviation is approximately 3.48 feet per coordinate.
+
+Thus, the optimization appears to admit a pair of energetically equivalent, opposite-handed trajectories rather than preferring a single mirror-symmetric one.
+
+## 3. What happens to the collective snake?
+
+Comparison of FEAST trajectories and collective envelopes for symmetric and two opposite-handed asymmetric solutions
+
+Top: all 20 individual traces. Bottom: collective juggler configurations at beats 0 and 5, joined in angular order to illustrate the evolving envelope, not the passing connections.
+
+Your clarification about the snake is important. The visually striking oscillation is a collective effect, produced by the synchronized, phase-shifted movement of the entire group.
+
+An asymmetric master trace can still produce a highly organized collective oscillation. Reversing the handedness reverses the temporal progression of that pattern without changing its cost.
+
+That is quite different from demanding that the individual trajectories themselves be mirror-symmetric.
+
+## 4. What we have—and haven't—established
+
+This is evidence of symmetry breaking in the model I reconstructed from your report. The report preserved the objective's structure but not every numerical penalty weight, so these are not guaranteed to reproduce yesterday's exact optimization.
+
+Also, the collision requirement remains a soft penalty rather than a hard constraint. The asymmetric solution has a sampled minimum center separation of 6.13 feet, just above the required 6 feet, but below the 6.18-foot buffer target.
+
+Most importantly, multiple optimization starts converged toward essentially the same asymmetric objective value, but that does not establish a global minimum.
+
+## Files from the experiment
+
+- Complete comparison Python code
+- Numerical results for all optimization starts
+- Best asymmetric master trace
+- Mirror-symmetric master trace
+
+## My conclusion
+
+The experiment supports a genuinely interesting possibility: an optimized FEAST can preserve the symmetry between clockwise and counterclockwise performance while breaking the mirror symmetry of each individual juggler's path.
+
+The symmetry belongs to the pair of possible choreographies, not necessarily to either choreography individually.
+
+And this may actually explain something about the elegance of the collective snake: a coordinated group can exhibit striking global order without requiring each participant's trajectory to possess every symmetry of the overall problem.
+
+The next particularly revealing test would be to determine whether the mirror-symmetric stationary solution is a saddle point of the unrestricted objective—meaning that an infinitesimal asymmetric perturbation can lower the cost—or merely a higher-cost local minimum. That would sharpen our understanding of the symmetry breaking considerably.
+
+## MAN
+
+would you create the .gif animation for both the clockwise and countclockwise optimal solutions (no symmetry constraints)?
+
+###
+...
+
+###
+I checked the pass lengths in the latest unconstrained solution, and found something revealing: none of the 190 actual passes is shorter than 6 feet.
+
+| Passing-distance measure | Current solution |
+| ------------------------ | ---------------- |
+| Shortest pass            | 6.18 ft          |
+| Median pass              | 10.04 ft         |
+| Mean pass                | 9.63 ft          |
+| Longest pass             | 10.08 ft         |
+| Passes shorter than 6 ft | 0                |
+
+The mean is lower than yesterday's approximately 10.15 ft, but the more important difference is that some passes are clustered near 6.18 ft.
+
+Simply adding a penalty below 6 feet therefore won't change this solution: that penalty would be zero for every existing pass.
+
+I agree with your practical preference, though. I'll retain 6 feet as the hard lower comfort threshold and also test a gentler preference against short passes, so the optimizer has an incentive to move more of them into the 9–12-foot range.
+
+## Revised optimization result
+
+The additional short-pass preference produces a meaningful change without imposing radial symmetry.
+
+| Measure                               | Previous | Revised  |
+| ------------------------------------- | -------- | -------- |
+| Shortest pass                         | 6.18 ft  | 8.91 ft  |
+| Average pass                          | 9.63 ft  | 9.92 ft  |
+| Longest pass                          | 10.08 ft | 10.08 ft |
+| Walking per cycle                     | 56.67 ft | 59.88 ft |
+| Passes crossing another personal disk | 0        | 0        |
+
+I used a strong penalty below 6 feet and a gentler penalty below 9 feet. The latter is responsible for the change.
+
+The trade-off is approximately 3.21 additional feet of walking per juggler per cycle, in exchange for eliminating the cluster of short, roughly 6-foot passes.
+
+This solution remains unconstrained with respect to radial mirror symmetry. The clockwise and counterclockwise choreographies will be exact temporal reversals of one another.
+
+## Updated animations and code
+
+Clockwise FEAST — longer passes
+
+20 jugglers, optimized unconstrained motion
+
+Counterclockwise FEAST — longer passes
+
+Exact time reversal of the clockwise choreography
+
+Optimization code
+
+Animation code
+
+Optimized trace coordinates
+
+Both GIFs show the collective oscillating envelope and passes at their scheduled beats. I verified that the passing segments avoid other jugglers' 3-foot disks at those beats; the animations do not simulate clubs in flight.
+
+One remaining consideration: yesterday's solution had mean passes of about 10.15 feet and walking of 55.65 feet. This revised model gets closer on throwing distances, but still requires more walking. That suggests we should continue refining the short-pass preference, rather than simply imposing more movement penalties, to recover yesterday's particularly smooth collective motion.
+
+
+### MAN
+
+In yesterday's animation we marked along each trace the juggler's position at every one of n passing beats.  For some reason that solution was much smoother, maybe less acceleration, than what you find.  Or maybe there was some other difference in the code, which I don't have.  I have the animation files.  I'm trying to get closer to code for yesterday's solution. I'm also including some R code you created (though I'm not certain it's for this very same solution.) I do like the style of output from gganimate in R, and would prefer R to python code.
+
+###
+
+Yes. I've generated the 20-person FEAST animations with the additional structural details, using the reconstructed smooth, unconstrained optimization.
+
+Clockwise FEAST — animated GIF
+
+120 frames, 10-second loop
+
+Counterclockwise FEAST — animated GIF
+
+Exact time reversal of the clockwise animation
+
+Optimized master trace coordinates — CSV
+
+Can be imported into the R reconstruction.
+
+Both animations include colored individual traces, 20 small position markers on every trace, home-base crosses, numbered jugglers, 3-foot personal circles, and the evolving collective envelope. Passing lines appear at the scheduled passing beats.
+
+## Numerical checks
+
+| Measure                             | Reconstructed model |
+| ----------------------------------- | ------------------- |
+| Mean passing distance               | 9.63 ft             |
+| Longest pass                        | 10.08 ft            |
+| Shortest pass                       | 6.18 ft             |
+| Walking per juggler                 | 56.67 ft            |
+| Minimum sampled separation          | 6.13 ft             |
+| Passes intersecting bystander disks | 0 at passing beats  |
+
+An important qualification: These were rendered in Python using the reconstructed mathematical model, rather than with R's gganimate, because R is unavailable in this environment.
+
+The results also do not yet reproduce yesterday's roughly 10.15-foot average pass and exceptionally smooth-looking motion. We have recovered the structural visualization and verified the geometry, but I would still regard yesterday's animation as our target for the next optimization refinement.
+
+
+###...
+### MAN
+
+ok, two more challenges.  1st, redo this same-style/same-constrained optimization but for n=16 jugglers.   Then the 2nd is to try it for an odd number, say n=13.
+
+###
+Both optimizations have converged. The encouraging result is that the same smooth, unconstrained master-trace approach works for both 16 and 13 jugglers, including the odd-numbered case.
+
+## Initial numerical results
+
+| Measure                         | n = 16   | n = 13   |
+| ------------------------------- | -------- | -------- |
+| Walking per juggler per cycle   | 42.51 ft | 31.37 ft |
+| Average pass                    | 9.48 ft  | 9.35 ft  |
+| Longest pass                    | 10.09 ft | 10.11 ft |
+| Shortest pass                   | 6.18 ft  | 6.18 ft  |
+| Minimum center separation       | 6.17 ft  | 6.17 ft  |
+| Passes crossing bystander disks | 0        | 0        |
+| RMS acceleration (ft/beat²)     | 1.47     | 1.29     |
+
+Both solutions use the stronger acceleration penalty of 1.60, the 10-foot soft throwing threshold, a strong penalty below 6 feet, and no imposed radial mirror symmetry.
+
+One interesting difference concerns the phantom passes. For 16 jugglers, some beats contain two phantom passes and others contain none. For 13 jugglers, every beat contains exactly one phantom pass. The optimizer handles both schedules without changing the underlying geometric model.
+
+## 1. FEAST with 16 jugglers
+
+Clockwise animation
+
+Counterclockwise animation
+
+64 frames per animation, with the complete traces, 16 beat markers per juggler, home crosses, numbered disks, and evolving collective envelope.
+
+The 16-person model performs 120 actual passes over its 16-beat cycle. Its 42.51-foot walking distance is appreciably shorter than the 20-person version, while retaining nearly the same average throwing distance.
+
+## 2. FEAST with 13 jugglers
+
+Clockwise animation
+
+Counterclockwise animation
+
+52 frames per animation, including all 13 passing-beat markers on each individual's trace.
+
+The 13-person case has 78 actual passes and 13 phantom passes per cycle. The odd-numbered schedule works without requiring an additional idle beat, and the resulting geometry retains the collective oscillation.
+
+## R code and optimized coordinates
+
+Download generalized R/gganimate code
+
+One parameterized script for both group sizes, including optimization and animation.
+
+n=16 optimized coordinates
+
+n=13 optimized coordinates
+
+Python optimization code
+
+Code used to compute and numerically validate these solutions.
+
+The R script can be run with either:
+
+```
+Rscript FEAST_16_13_smoother_gganimate.R 16
+Rscript FEAST_16_13_smoother_gganimate.R 13
+```
+
+The GIFs were rendered from the optimized Python coordinates. The equivalent R optimization and gganimate implementation is supplied, but hasn't been executed in R here.
+
+## What I find interesting
+
+The transition from 16 to 13 jugglers is not merely a matter of scaling down the choreography. The odd-numbered FEAST has a different distribution of phantom passes, yet the same shared-master-trace construction still produces a smooth, orderly pattern.
+
+Both solutions preserve the features we've been developing: long comfortable throws, low acceleration, personal-space separation, and the visually striking collective oscillation.
+
+I would be particularly interested in your reaction to the 13-juggler animation. Its odd parity may give the collective snake a subtly different rhythm from the even-numbered versions, despite using exactly the same optimization principles.
+
