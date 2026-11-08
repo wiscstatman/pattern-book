@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Feast Pattern Optimization Notes and Summary</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="/usr/share/javascript/mathjax/MathJax.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Feast Pattern Optimization Notes and Summary</h1>
+</header>
+<h1 id="overview">Overview</h1>
+<p>This document summarizes our discussion of the multiperson
+<strong>feast</strong> passing pattern, the mathematical model used to
+optimize the juggler motion, and selected numerical findings.</p>
+<p>The main modeling goals were:</p>
+<ol type="1">
+<li>keep each juggler near a home position on a regular <span
+class="math inline">\(n\)</span>-gon,</li>
+<li>keep passing distances comfortable,</li>
+<li>avoid overlap of the 3-foot-radius personal discs,</li>
+<li>encourage smooth motion between beats, and</li>
+<li>exploit the rotational symmetry of the feast by using a
+<strong>single master trace</strong> for all jugglers.</li>
+</ol>
+<p>The summary tables below use the <strong>symmetry-constrained
+single-trace model</strong> for <span
+class="math inline">\(n=8,10,12,14,16,18,20\)</span>.</p>
+<h1 id="feast-pairing-rule">Feast pairing rule</h1>
+<p>Index jugglers by <span class="math inline">\(i=1,
+\dots,n\)</span>, and index passing beats by <span
+class="math inline">\(t=0,1,
+\dots,n-1\)</span>. On beat <span class="math inline">\(t\)</span>,
+juggler <span class="math inline">\(i\)</span> pairs with</p>
+<p><span class="math display">\[
+j(i,t) = 1 + ((t-i) \operatorname{mod} n).
+\]</span></p>
+<p>If <span class="math inline">\(j(i,t)=i\)</span>, that beat is a
+phantom pass for juggler <span class="math inline">\(i\)</span>. This
+produces a noncrossing round-robin pattern in which each juggler
+eventually passes to every other juggler once, plus one phantom.</p>
+<h1 id="symmetry-reduction-one-shared-trace">Symmetry reduction: one
+shared trace</h1>
+<p>The main improvement for larger <span
+class="math inline">\(n\)</span> was to enforce symmetry directly.
+Instead of optimizing all jugglers independently, I optimize a single
+closed trace <span class="math inline">\(\mathbf{q}_k \in
+\mathbb{R}^2\)</span> for <span class="math inline">\(k=0,
+\dots,n-1\)</span>, expressed in local coordinates relative to a home
+base.</p>
+<p>All other jugglers are generated by rotation and time shift:</p>
+<p><span class="math display">\[
+\mathbf{x}_i(t) = R\!\left(-\frac{2\pi(i-1)}{n}\right)
+\mathbf{q}_{t-2(i-1) \operatorname{mod} n},
+\]</span></p>
+<p>where <span class="math inline">\(R(\theta)\)</span> is the planar
+rotation matrix. This reduction changes the optimization from <span
+class="math inline">\(2n^2\)</span> variables to only <span
+class="math inline">\(2n\)</span> variables. For example, for <span
+class="math inline">\(n=20\)</span> the number of optimized coordinates
+drops from 800 to 40.</p>
+<h1 id="objective-function">Objective function</h1>
+<p>The model uses a weighted sum of penalties. Let <span
+class="math inline">\(R\)</span> denote the home-circle radius and let
+<span class="math inline">\(\mathbf{q}_k=(u_k,v_k)\)</span>, where <span
+class="math inline">\(u_k\)</span> is radial position and <span
+class="math inline">\(v_k\)</span> is tangential position in the
+juggler’s local frame. A convenient objective is:</p>
+<p><span class="math display">\[
+E(\mathbf{q}) = E_{\mathrm{home}} + E_{\mathrm{move}} +
+E_{\mathrm{accel}} + E_{\mathrm{throw}} + E_{\mathrm{coll}}.
+\]</span></p>
+<h2 id="home-position-penalty">1. Home-position penalty</h2>
+<p>Radial motion was taken to be easier than sideways motion, so I used
+an anisotropic home penalty:</p>
+<p><span class="math display">\[
+E_{\mathrm{home}} = \alpha_r \sum_k (u_k - R)^2 + \alpha_\tau \sum_k
+v_k^2,
+\]</span></p>
+<p>with <span class="math inline">\(\alpha_\tau &gt; \alpha_r\)</span>.
+In the main symmetric runs the values were approximately <span
+class="math inline">\(\alpha_r = 0.08\)</span> and <span
+class="math inline">\(\alpha_\tau = 0.50\)</span>.</p>
+<h2 id="beat-to-beat-motion-penalty">2. Beat-to-beat motion penalty</h2>
+<p><span class="math display">\[
+E_{\mathrm{move}} = \eta \sum_k \lVert \mathbf{q}_k - \mathbf{q}_{k-1}
+\rVert^2.
+\]</span></p>
+<p>This discourages large jumps between consecutive passing beats.</p>
+<h2 id="smoothness-acceleration-penalty">3. Smoothness / acceleration
+penalty</h2>
+<p><span class="math display">\[
+E_{\mathrm{accel}} = \kappa \sum_k \left\lVert \mathbf{q}_{k+1} -
+2\mathbf{q}_k + \mathbf{q}_{k-1} \right\rVert^2.
+\]</span></p>
+<p>This favors smooth closed traces rather than polygonal or kinked
+ones.</p>
+<h2 id="throw-distance-penalty">4. Throw-distance penalty</h2>
+<p>At each passing beat, if two jugglers in a pair are distance <span
+class="math inline">\(d\)</span> apart, the original soft penalty
+was</p>
+<p><span class="math display">\[
+P_{\mathrm{throw}}(d) = \beta (d-6)_+^2 + \Gamma (d-12)_+^2,
+\]</span></p>
+<p>where <span class="math inline">\((z)_+ = \max(z,0)\)</span>. This
+encourages throws shorter than 6 ft and makes throws above 12 ft very
+expensive. This choice led to the first family of “beautiful” symmetric
+solutions with longest pass under about 8 ft.</p>
+<p>Later, for the <span class="math inline">\(n=20\)</span> trade-off
+experiment, I replaced the first threshold by 10 or 11 feet to better
+reflect your practical experience that throws are comfortable up to
+about 10–12 ft and deteriorate mainly beyond 12 ft.</p>
+<h2 id="collision-penalty">5. Collision penalty</h2>
+<p>Let <span class="math inline">\(d_{ab}(s)\)</span> be the distance
+between jugglers <span class="math inline">\(a\)</span> and <span
+class="math inline">\(b\)</span> at a sampled time <span
+class="math inline">\(s\)</span> along the smooth motion between beats.
+With 3-ft personal radii, center-to-center spacing should stay at or
+above 6 ft, so I used</p>
+<p><span class="math display">\[
+E_{\mathrm{coll}} = \lambda \sum_{s,a&lt;b} (\ell - d_{ab}(s))_+^2,
+\]</span></p>
+<p>with a target clearance <span class="math inline">\(\ell \approx
+6.18\)</span> ft in the symmetric code. The 6.18-ft value was a small
+buffer so that dense sampling would still keep the realized minimum
+separation very near 6 ft.</p>
+<h1 id="optimization-method">Optimization method</h1>
+<p>The numerical optimization was carried out in Python with
+<strong>SciPy’s</strong>
+<code>scipy.optimize.minimize(..., method="L-BFGS-B")</code>. Important
+implementation details:</p>
+<ul>
+<li>the reduced variables are the <span class="math inline">\(n\)</span>
+key points of the single master trace,</li>
+<li>analytic gradients were supplied for the objective,</li>
+<li>periodic cubic interpolation was used to create a smooth trace from
+the discrete beat positions,</li>
+<li>collision penalties were sampled at several intermediate times
+between beats,</li>
+<li>several smooth initial guesses were tried for the single-trace
+model, and</li>
+<li>solutions were checked afterward by denser sampling to estimate
+minimum separation.</li>
+</ul>
+<p>This is a <strong>local optimization</strong> method, not a proof of
+global optimality, so initialization matters. In particular, the
+symmetry-constrained model gave much more reliable and believable
+answers than the unconstrained <span
+class="math inline">\(2n^2\)</span>-variable model for larger <span
+class="math inline">\(n\)</span>.</p>
+<h1 id="numerical-findings-for-n8-to-n20">Numerical findings for <span
+class="math inline">\(n=8\)</span> to <span
+class="math inline">\(n=20\)</span></h1>
+<p>The table below reports the recomputed length of the optimal smooth
+master trace for each even <span class="math inline">\(n\)</span> from 8
+to 20, together with selected other metrics. The trace length is the
+distance traveled by the center of one juggler’s disc over a full
+cycle.</p>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>n</th>
+<th>Trace length (ft)</th>
+<th>Spin (rad)</th>
+<th>Spin (deg)</th>
+<th>Longest pass (ft)</th>
+<th>Largest step between beats (ft)</th>
+<th>Minimum sampled separation (ft)</th>
+<th>Home radius (ft)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>8.000</td>
+<td>17.582</td>
+<td>4.712</td>
+<td>270.000</td>
+<td>7.761</td>
+<td>2.837</td>
+<td>6.168</td>
+<td>9.146</td>
+</tr>
+<tr class="even">
+<td>10.000</td>
+<td>26.058</td>
+<td>5.027</td>
+<td>288.000</td>
+<td>7.802</td>
+<td>3.273</td>
+<td>6.173</td>
+<td>11.326</td>
+</tr>
+<tr class="odd">
+<td>12.000</td>
+<td>34.390</td>
+<td>5.236</td>
+<td>300.000</td>
+<td>7.810</td>
+<td>3.729</td>
+<td>6.175</td>
+<td>13.523</td>
+</tr>
+<tr class="even">
+<td>14.000</td>
+<td>42.667</td>
+<td>5.386</td>
+<td>308.571</td>
+<td>7.809</td>
+<td>4.073</td>
+<td>6.176</td>
+<td>15.729</td>
+</tr>
+<tr class="odd">
+<td>16.000</td>
+<td>50.617</td>
+<td>5.498</td>
+<td>315.000</td>
+<td>7.796</td>
+<td>4.638</td>
+<td>6.161</td>
+<td>17.940</td>
+</tr>
+<tr class="even">
+<td>18.000</td>
+<td>57.961</td>
+<td>5.585</td>
+<td>320.000</td>
+<td>7.785</td>
+<td>4.911</td>
+<td>6.158</td>
+<td>20.156</td>
+</tr>
+<tr class="odd">
+<td>20.000</td>
+<td>65.246</td>
+<td>5.655</td>
+<td>324.000</td>
+<td>7.769</td>
+<td>4.967</td>
+<td>6.155</td>
+<td>22.374</td>
+</tr>
+</tbody>
+</table>
+<p>Two patterns stand out:</p>
+<ul>
+<li>The <strong>trace length</strong> grows significantly with <span
+class="math inline">\(n\)</span>.</li>
+<li>The <strong>spin</strong> grows much more slowly, and in these
+symmetric solutions follows <span
+class="math display">\[S(n)=2\pi\left(1-\frac{2}{n}\right).\]</span>
+This gives 270° for <span class="math inline">\(n=8\)</span>, 288° for
+<span class="math inline">\(n=10\)</span>, …, up to 324° for <span
+class="math inline">\(n=20\)</span>.</li>
+</ul>
+<p>The figure below compares the optimized master traces across the
+range of <span class="math inline">\(n\)</span> values.</p>
+<figure>
+<img src="feast_8_to_20_trace_comparison.png"
+alt="Comparison of master traces for feast patterns with n=8 through n=20." />
+<figcaption aria-hidden="true">Comparison of master traces for feast
+patterns with <span class="math inline">\(n=8\)</span> through <span
+class="math inline">\(n=20\)</span>.</figcaption>
+</figure>
+<h1 id="notes-on-the-spin-metric">Notes on the spin metric</h1>
+<p>For each actual pass, define the facing angle of juggler 1 by the
+angle from juggler 1 to their partner:</p>
+<p><span class="math display">\[
+\theta_t = \operatorname{atan2}(y_j-y_i,\,x_j-x_i).
+\]</span></p>
+<p>The spin is the sum of absolute wrapped changes in this facing
+direction from one actual pass to the next, including the wrap from the
+last pass back to the first pass in the next cycle:</p>
+<p><span class="math display">\[
+S = \sum_t
+\left|\operatorname{Arg}\left(e^{i(\theta_{t+1}-\theta_t)}\right)\right|.
+\]</span></p>
+<p>Phantom beats are skipped in this accumulation. In practice, this
+measures the total amount a juggler must turn to keep “squaring up” to
+successive passing partners.</p>
+<h1 id="reworking-the-n20-case-to-allow-longer-passes">Reworking the
+<span class="math inline">\(n=20\)</span> case to allow longer
+passes</h1>
+<p>Your practical observation was that feast patterns work well when
+pass lengths are allowed up to about 10–12 ft, but deteriorate quickly
+beyond 12 ft. That suggested modifying the throw penalty so the
+optimizer would not work so hard to shorten already-manageable
+throws.</p>
+<p>The next table compares several <span
+class="math inline">\(n=20\)</span> scenarios.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario</th>
+<th>Trace length (ft)</th>
+<th>Longest pass (ft)</th>
+<th>Mean pass (ft)</th>
+<th>Largest step between beats (ft)</th>
+<th>Minimum sampled separation (ft)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Original 6-ft soft threshold</td>
+<td>65.246</td>
+<td>7.769</td>
+<td>6.793</td>
+<td>4.967</td>
+<td>6.155</td>
+</tr>
+<tr class="even">
+<td>10-ft soft threshold</td>
+<td>55.647</td>
+<td>11.112</td>
+<td>10.146</td>
+<td>4.433</td>
+<td>6.174</td>
+</tr>
+<tr class="odd">
+<td>11-ft soft threshold</td>
+<td>54.224</td>
+<td>11.989</td>
+<td>10.957</td>
+<td>4.279</td>
+<td>6.178</td>
+</tr>
+<tr class="even">
+<td>Free to 10 ft</td>
+<td>53.789</td>
+<td>12.015</td>
+<td>11.231</td>
+<td>4.286</td>
+<td>6.176</td>
+</tr>
+</tbody>
+</table>
+<p>This trade-off study shows that allowing longer passes in the 10–12
+ft range can materially reduce the total walking distance per cycle
+while retaining a symmetric, smooth choreography.</p>
+<figure>
+<img src="feast_20_throw_tradeoff_comparison.png"
+alt="Comparison of n=20 trade-off solutions under different throw-distance preferences." />
+<figcaption aria-hidden="true">Comparison of <span
+class="math inline">\(n=20\)</span> trade-off solutions under different
+throw-distance preferences.</figcaption>
+</figure>
+<p>A practical takeaway is that the original 6-ft soft threshold created
+very elegant solutions, but also more walking than may be necessary. For
+larger <span class="math inline">\(n\)</span>, a gentler throw penalty
+beginning near 10 ft is probably a better reflection of real passing
+practice.</p>
+<h1 id="concluding-remarks">Concluding remarks</h1>
+<p>The single-master-trace formulation seems to be the right
+mathematical description of the feast when one wants symmetric and
+realistic solutions. It gives:</p>
+<ul>
+<li>a dramatic reduction in optimization dimension,</li>
+<li>much more believable solutions for larger <span
+class="math inline">\(n\)</span>,</li>
+<li>easy comparison across different group sizes, and</li>
+<li>a clean way to study trade-offs between throw length, walking
+distance, and smoothness.</li>
+</ul>
+<p>Natural next refinements would be:</p>
+<ol type="1">
+<li>adding an explicit penalty on <strong>peak speed</strong> or
+<strong>peak acceleration</strong>, not just total movement,</li>
+<li>sampling even more densely (or constraining analytically) to
+guarantee non-overlap throughout the motion,</li>
+<li>tuning throw thresholds and weights from practical juggling
+experience, and</li>
+<li>comparing 4-count, 8-count, and slower patterns by normalizing
+movement to <strong>distance per club release</strong> rather than only
+distance per cycle.</li>
+</ol>
+<h1 id="files-included-referred-to-in-this-report">Files included /
+referred to in this report</h1>
+<ul>
+<li><code>feast_8_to_20_metrics.csv</code></li>
+<li><code>feast_trace_length_recomputed.csv</code></li>
+<li><code>feast_8_to_20_trace_comparison.png</code></li>
+<li><code>feast_20_throw_tradeoff_metrics.csv</code></li>
+<li><code>feast_20_throw_tradeoff_comparison.png</code></li>
+<li><code>feast_single_trace_model.py</code></li>
+<li><code>feast_20_longer_passes.gif</code></li>
+<li><code>feast_20_symmetric.gif</code></li>
+</ul>
+</body>
+</html>

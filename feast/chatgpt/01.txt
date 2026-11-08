@@ -1,0 +1,549 @@
+I have a multiperson juggling pattern that you can help me with.  I have n jugglers (think of n=8 for starters, but I'd like code/math for any n), arranged regularly around a circle in order 1, 2,..., n, say moving clockwise around the circle.   Of course in addition to being on the circle, they also represent corners of a regular polygon.  These corners represent 'home base' positions for the jugglers, but each will move around near that home base as the pattern progresses.  The pattern itself progresses with jugglers all juggling in sync, and with exchanges (single spin passes) on some periodic base beat, such as 4-count, which is a pass on every fourth club release, but any count will do for the question I have.    Assume n is even initially, and note that passes happen on beat one between jugglers i and j as follows (1,n), (2,n-1), (3,n-2)..., and (with n=8) (4,5).   Prior to the next passing beat, jugglers shift and rotate slightly in order to square up with new partners.  Again with n=8, the passing pairs are (2,8), (3,7),(4,6).  On that 2nd beat, juggler 1 does not pass, and neither does juggler 5.   On the third passing beats we again 4 pairs of exchanges: (1,2), (3,8),(4,7), (5,6).  On the fourth passing beat exchanges are (1,3), (8,4), (7,5), and jugglers 6 and 2 don't pass (we say each is doing a phantom pass).   On the 5th beat we again have four pairs (1,4),(2,3),(8,5),(7,6), and so on.  Not my notation (i,j) ought be {i,j}, since these are really unordered pairs that define each exchange.   You'll also recognize that each juggler is passing 'around the circle', including themselves as a phantom beat.   We call this a 'feast pattern', since everyone is feeding everyone else.   Notice too that the exchanges on any passing beat  never involve crossing lanes; we'd get a cross, for example if (1,3) and (2,5)  happened on the same beat, but that never happens, and it's one reason the pattern is fun to do.  Now to my question.   When we perform the feast, we don't stick rigidly to the positions of the regular polygon, because to do so would require some very long passes across the circle.  What actually happens is that jugglers shift from their home base towards the person they are passing next to, if that person is on the other side of the circle, and they shift away if that person is near by along the perimeter.   My primary goal is to understand the trace of each jugglers 'optimal' motion in this pattern.   I would assume that all jugglers move through a local trace near their home base, with the size and shape of this trace equal for all jugglers, but just rotated as we go around to different jugglers.   Since the juggling pattern takes n passing beats to complete, I guess there are n specific positions along this trace, and I'd love to see some depiction (maybe with R gganimate) showing jugglers moving through the positions along their respective trace.    There is presumably some objective function being optimized.  I'd like the objective to reflect (1) a penalty (maybe in distance squared) for moving away from the home base, and a penalty for having to make long throws.   For dimensions, consider each juggler as like a disc of radius  about 3 ft.   The discs may move but may not overlap.   And a throwing distance should be penalized as it gets beyond 6 feet, and should receive a high penalty for going beyond around 12 feet.
+
+###
+
+## 1. The mathematics of the feast
+
+There is a particularly nice structure to your pattern: it is a cyclic round-robin matching of the jugglers, with phantom passes included. This makes it possible to formulate the entire problem for arbitrary \\(n\\), rather than programming the eight-person case separately.
+
+Number the passing beats \\(t=0,1,\ldots,n-1\\), and label the jugglers \\(i=1,\ldots,n\\).
+
+On beat \\(t\\), the partner of juggler \\(i\\) is
+
+\\[ \boxed{j(i,t)=1+((t-i)\bmod n)} \\]
+
+When \\(j(i,t)=i\\), that juggler makes a phantom pass. Otherwise, \\(i\\) and \\(j\\) exchange clubs.
+
+For \\(n=8\\), this gives:
+
+| Passing beat | Actual exchanges   | Phantom passes |
+| ------------ | ------------------ | -------------- |
+| 1            | 1–8, 2–7, 3–6, 4–5 | None           |
+| 2            | 2–8, 3–7, 4–6      | 1, 5           |
+| 3            | 1–2, 3–8, 4–7, 5–6 | None           |
+| 4            | 1–3, 4–8, 5–7      | 2, 6           |
+| 5            | 1–4, 2–3, 5–8, 6–7 | None           |
+| 6            | 1–5, 2–4, 6–8      | 3, 7           |
+| 7            | 1–6, 2–5, 3–4, 7–8 | None           |
+| 8            | 1–7, 2–6, 3–5      | 4, 8           |
+
+Every juggler encounters every other juggler exactly once, plus one phantom, over the \\(n\\) beats.
+
+An important symmetry is
+
+\\[ j(i+k,t+2k)\equiv j(i,t)+k\pmod n. \\]
+
+This means a spatial rotation by \\(k\\) positions corresponds to a time shift of \\(2k\\) beats. Thus your expectation of identical traces, rotated appropriately, has a strong mathematical basis, although the traces generally have different phases in time.
+
+## 2. What should be optimized?
+
+Let \\(\mathbf h_i\\) be juggler \\(i\\)'s home position, and let \\(\mathbf x\_{i,t}\in\mathbb R^2\\) be their position at passing beat \\(t\\).
+
+I would start with four costs, rather than just two:
+
+\\[ \boxed{ E=E\_{\text{home}}+E\_{\text{throws}}+ E\_{\text{movement}}+E\_{\text{collision}} } \\]
+
+Home-position cost
+
+\\[ E\_{\text{home}}= \alpha\sum\_{t,i}\\|\mathbf x\_{i,t}-\mathbf h_i\\|^2 \\]
+
+This discourages wandering too far from home.
+
+Throw-distance cost
+
+For a passing pair \\(\\{i,j\\}\\), define \\(d\_{ij,t}=\\|\mathbf x\_{i,t}-\mathbf x\_{j,t}\\|\\).
+
+A useful penalty is
+
+\\[ P(d)=\beta(d-6)\_+^2+\gamma(d-12)\_+^2, \qquad (z)\_+=\max(z,0). \\]
+
+This penalizes throws longer than 6 feet and adds a much stronger cost beyond 12 feet. Phantom passes are excluded from this term.
+
+Movement cost
+
+\\[ E\_{\text{movement}}= \eta\sum\_{t,i}\\|\mathbf x\_{i,t+1}-\mathbf x\_{i,t}\\|^2 \\]
+
+with periodic indexing, so beat \\(n\\) returns smoothly to beat 1.
+
+This is especially important in practice. Without it, the optimum might demand that jugglers jump abruptly from one passing position to another.
+
+Collision constraint
+
+For all distinct \\(i,j\\),
+
+\\[ \boxed{\\|\mathbf x\_{i,t}-\mathbf x\_{j,t}\\|\geq6\text{ ft}.} \\]
+
+Your 3-foot-radius discs imply a minimum center-to-center spacing of 6 feet.
+
+Ideally, this is a hard constraint, not merely an extra cost. We must also check collisions between passing beats, not just at the discrete positions.
+
+One further consideration: the mathematically shortest throw need not be the physically best throw. Eventually, we could add a facing-direction cost and a penalty for passing lanes that become awkwardly close, while keeping the no-crossing property.
+
+## 3. An animated eight-juggler example
+
+I implemented a numerical version of the model and generated an illustration.
+
+Optimized eight-juggler feast, showing home bases, passing lanes, and colored movement paths
+
+The colored loops trace each juggler's positions over one eight-beat cycle.
+
+View animated GIF
+
+For this example I chose adjacent home bases 7 feet apart, leaving a little room between the 3-foot-radius personal discs.
+
+Home-circle radius
+
+# 9.15 ft
+
+Longest throw
+
+# 9.05 ft
+
+Maximum home displacement
+
+# 4.62 ft
+
+The numerical solution was slightly expanded to eliminate overlaps during straight-line transitions between beats. Its minimum separation over those transitions is approximately 6.01 feet. This is an illustrative, locally optimized solution, not a proof of global optimality.
+
+## 4. R code and position data
+
+I've prepared the R script with `ggplot2` and `gganimate`. It accepts an arbitrary integer \\(n\geq3\\), constructs all partner exchanges, optimizes periodic positions, and produces an animation.
+
+R optimization and animation script
+
+Editable parameters for number of jugglers, distance thresholds, and optimization weights.
+
+Eight-juggler optimized positions (CSV)
+
+Coordinates in feet for each juggler on each passing beat.
+
+Eight-juggler animation (GIF)
+
+A complete, looping feast cycle.
+
+The R script uses a collision penalty and checks separation at the passing beats. Unlike the supplied adjusted eight-person example, it does not yet guarantee nonoverlap throughout transitions; that would require a hard constrained, continuous-time optimization.
+
+## 5. Where I would take this next
+
+There is a particularly interesting question hidden in your original conjecture: is the optimal trace a simple, smooth, closed curve, and is it necessarily identical for every juggler up to rotation and time shift?
+
+The matching rule has the required symmetry, but an unconstrained numerical optimizer can find solutions that break that symmetry. A stronger model could explicitly enforce rotated copies of one shared trace, dramatically reducing the number of independent variables.
+
+I would also experiment with replacing the step-to-step movement penalty with an acceleration penalty. That would favor smooth trajectories and discourage abrupt turns, which seems more realistic for people moving while juggling.
+
+Finally, I would compare the resulting shapes as \\(n\\) increases. The geometry of an eight-person feast is quite different from that of a sixteen-person feast, particularly when the home-base separation and maximum comfortable throw distance remain fixed.
+
+One question that would materially affect the next version: When your jugglers move closer together for a long pass, do they mostly move radially toward the center of the circle, or do they also make significant sideways movements along the perimeter? That distinction could help determine whether we should optimize unrestricted two-dimensional motion or a simpler radial-and-tangential model.
+
+####
+You've done a really nice job capturing the feast positioning.  On the current implementation it would be nice to see these traces smoothed out, even if the discrete passing points are marked.   Aside from that, I'm very interested in larger n, such as n=10 or n=12, and whether this tear-drop trace continues to appear. On your question, I would say jugglers would tend more easily to move radially in and out from the center, rather than left-right.
+
+####
+
+Yes — both of those directions make sense.
+
+1. **For display**, the traces should be smoothed, while still marking the discrete passing locations.
+2. **For modeling**, your “mostly radial, not left-right” preference is exactly the right structural refinement, and it helps explain why the tear-drop shape survives for larger \(n\).
+
+## 1. Two different notions of “smooth”
+
+There are really two separate improvements one can make:
+
+### A. Smooth the *drawing*
+Keep the optimized discrete positions \(\mathbf x_{i,1},\dots,\mathbf x_{i,n}\), but draw each juggler’s loop using a **periodic spline** through those points. This improves the picture immediately and still shows the actual passing points.
+
+### B. Smooth the *motion itself*
+Add a curvature / acceleration penalty to the optimization:
+
+\[
+E_{\text{smooth}}
+=
+\kappa \sum_{t,i}
+\left\|
+\mathbf x_{i,t+1} - 2\mathbf x_{i,t} + \mathbf x_{i,t-1}
+\right\|^2 .
+\]
+
+This is the more principled version. It penalizes “kinks” in the beat-to-beat motion and tends to produce a genuinely smoother loop, not just a prettier plot.
+
+So my recommendation is:
+
+- **use periodic splines for visualization**, and
+- **add a second-difference penalty** if you want the optimization itself to favor smooth traces.
+
+---
+
+## 2. Radial-vs-tangential movement
+
+Since you said jugglers naturally move more easily **in and out** than **sideways**, I’d replace the isotropic home penalty
+
+\[
+\alpha \|\mathbf x_{i,t} - \mathbf h_i\|^2
+\]
+
+with an anisotropic one.
+
+Let \(u_i^{(r)}\) be the outward radial unit vector at home base \(i\), and \(u_i^{(\tau)}\) the tangential unit vector. If
+
+\[
+\mathbf x_{i,t} - \mathbf h_i
+=
+r_{i,t} u_i^{(r)} + \tau_{i,t} u_i^{(\tau)},
+\]
+
+then use
+
+\[
+E_{\text{home}}
+=
+\sum_{i,t}
+\left(
+\alpha_r r_{i,t}^2
++
+\alpha_\tau \tau_{i,t}^2
+\right),
+\qquad
+\alpha_\tau > \alpha_r.
+\]
+
+That means sideways motion is penalized more than radial motion.
+
+This is a very natural model for what you described.
+
+---
+
+## 3. Why the tear-drop appears
+
+The tear-drop is not an accident. It comes from an asymmetry in what the juggler is trying to achieve over the cycle:
+
+- when the next partner is **far away**, the efficient way to shorten the throw is to move **inward** toward the center;
+- when the next partner is **nearby** along the ring, the juggler does **not** need a comparably large outward move, because outward motion helps only a little and creates crowding issues.
+
+So the loop typically has:
+
+- a **broad, shallow outer side**, and
+- a **deeper inward point** aimed toward the center.
+
+That is exactly a tear-drop / lopsided oval.
+
+With a radial preference, this effect gets stronger.
+
+---
+
+## 4. What I found for larger \(n\)
+
+Using the same basic optimization idea, but with radial motion cheaper than tangential motion, I checked \(n=8,10,12\).
+
+Qualitatively:
+
+- **\(n=8\)**: clear tear-drop
+- **\(n=10\)**: still clearly tear-drop, more elongated inward
+- **\(n=12\)**: still the same basic form, but now much more stretched radially
+
+So the answer is: **yes, the tear-drop persists**, and in fact becomes **more pronounced** for larger \(n\), at least with fixed adjacent home spacing and the same comfort thresholds.
+
+A useful summary from one representative run (same adjacent home spacing \(=7\) ft, same personal radius \(=3\) ft):
+
+| \(n\) | Home-circle radius (ft) | Max throw (ft) | Max displacement from home (ft) | Qualitative trace |
+|---|---:|---:|---:|---|
+| 8  | 9.15 | 8.57 | 4.94 | tear-drop |
+| 10 | 11.33 | 9.02 | 7.20 | stronger tear-drop |
+| 12 | 13.52 | 12.06 | 11.88 | strongly inward-stretched tear-drop |
+
+Two important observations:
+
+1. **The home circle radius grows with \(n\)** if adjacent spacing is fixed:
+   \[
+   R=\frac{s}{2\sin(\pi/n)} \sim \frac{s\,n}{2\pi}.
+   \]
+   So larger groups naturally spread out more.
+
+2. By \(n=12\), with 7-foot adjacent spacing, the model is already pushing close to your “high penalty beyond 12 feet” throw threshold.
+
+So for larger \(n\), one of three things has to happen:
+
+- jugglers move **more inward**,
+- the adjacent home spacing \(s\) is reduced, or
+- longer throws must be accepted more often.
+
+That is exactly the kind of phase transition worth studying.
+
+---
+
+## 5. Best modeling upgrade from here
+
+If I were refining the model now, I would use
+
+\[
+E
+=
+E_{\text{throw}}
++
+E_{\text{home,radial/tangential}}
++
+E_{\text{movement}}
++
+E_{\text{smooth}}
++
+E_{\text{collision}}.
+\]
+
+Concretely:
+
+- **throw penalty**
+  \[
+  \beta(d-6)_+^2+\Gamma(d-12)_+^2
+  \]
+- **radial/tangential home penalty**
+  \[
+  \alpha_r r^2+\alpha_\tau \tau^2,\quad \alpha_\tau>\alpha_r
+  \]
+- **movement penalty**
+  \[
+  \eta\|\mathbf x_{t+1}-\mathbf x_t\|^2
+  \]
+- **smoothness penalty**
+  \[
+  \kappa\|\mathbf x_{t+1}-2\mathbf x_t+\mathbf x_{t-1}\|^2
+  \]
+- **collision**: enforce center-to-center separation \(\ge 6\) ft
+
+That would give you a much more realistic “human” trajectory.
+
+---
+
+## 6. R changes for smoothed traces
+
+Here is the key idea for smoothing the plotted loops in R.
+
+After your optimized `x[beat, juggler, xy]` array is computed, build a dense periodic spline for each juggler:
+
+```r
+dense_per_edge <- 30L
+
+trace_list <- lapply(seq_len(n), function(j) {
+  px <- x[,j,1]
+  py <- x[,j,2]
+  tt <- c(seq_len(n), n+1)
+
+  fx <- splinefun(tt, c(px, px[1]), method = "periodic")
+  fy <- splinefun(tt, c(py, py[1]), method = "periodic")
+
+  phase <- seq(1, n+1, length.out = n * dense_per_edge + 1)
+
+  data.frame(
+    juggler = factor(j),
+    phase = phase,
+    x = fx(phase),
+    y = fy(phase)
+  )
+})
+
+traces_smooth <- do.call(rbind, trace_list)
+```
+
+Then plot both the smooth path and the discrete passing points:
+
+```r
+ggplot() +
+  geom_path(
+    data = traces_smooth,
+    aes(x, y, group = juggler, color = juggler),
+    linewidth = 0.9, alpha = 0.5
+  ) +
+  geom_point(
+    data = positions,
+    aes(x, y, color = juggler),
+    size = 2
+  ) +
+  geom_point(
+    data = homes,
+    aes(x, y),
+    shape = 3, color = "grey55", size = 3
+  ) +
+  coord_fixed() +
+  theme_minimal()
+```
+
+That gives exactly what you asked for: **smoothed traces, with the key beat positions visibly marked**.
+
+---
+
+## 7. R change for radial preference
+
+This is the main model change I’d make.
+
+Suppose `home` is your matrix of home positions. Define radial and tangential unit vectors:
+
+```r
+radial_unit <- home / sqrt(rowSums(home^2))
+tangent_unit <- cbind(-radial_unit[,2], radial_unit[,1])
+```
+
+Then, inside the energy function, replace the isotropic home penalty with:
+
+```r
+dx <- x - initial
+
+radial_coord <- dx[,,1] * rep(radial_unit[,1], each = n) +
+                dx[,,2] * rep(radial_unit[,2], each = n)
+
+tang_coord   <- dx[,,1] * rep(tangent_unit[,1], each = n) +
+                dx[,,2] * rep(tangent_unit[,2], each = n)
+
+result <- result +
+  alpha_r * sum(radial_coord^2) +
+  alpha_t * sum(tang_coord^2)
+```
+
+with, for example,
+
+```r
+alpha_r <- 0.08
+alpha_t <- 0.50
+```
+
+so that tangential drift is significantly more expensive than radial movement.
+
+---
+
+## 8. If you want smoother *actual* motion
+
+Add this to the objective:
+
+```r
+prev_index <- c(n, 1:(n-1))
+next_index <- c(2:n, 1)
+accel <- x[next_index,,,drop=FALSE] - 2*x + x[prev_index,,,drop=FALSE]
+result <- result + kappa * sum(accel^2)
+```
+
+with something like
+
+```r
+kappa <- 0.3
+```
+
+to start.
+
+That term tends to suppress polygonal/kinky loops and makes the optimized trace itself more naturally rounded.
+
+---
+
+## 9. Ready-to-use updated script
+
+I prepared a revised script that includes:
+
+- larger-\(n\) support,
+- radial-vs-tangential home penalty,
+- smoothed periodic traces for display,
+- discrete passing points still marked.
+
+You can use it as a starting point here:
+
+**:chatgpt-content-reference{index="0"}[Updated R script: smooth traces + radial preference](sandbox:/mnt/data/feast_optimize_smooth_radial.R)**
+
+---
+
+If you want, the next natural thing I can do is one of these:
+
+1. **derive a reduced “single-juggler trace” model** using symmetry, so one loop generates all others by rotation/time shift; or  
+2. **make a comparison panel for \(n=8,10,12,14\)** and discuss when the feast geometry starts to become impractical under the 12-foot throw preference.
+
+###
+
+###
+
+Absolutely — here is the **smoothed animated feast GIF for \(n=20\)**, rendered with **slower pacing** to reflect the idea that for a group this large you’d likely lower the pass rate (8-count or slower) to give more time for motion between passing beats.
+
+**:chatgpt-content-reference{index="0"}[View the smoothed 20-person GIF](sandbox:/mnt/data/feast_20_smooth.gif)**
+
+I also saved:
+
+- **:chatgpt-content-reference{index="1"}[Static PNG of the 20-person smooth traces](sandbox:/mnt/data/feast_20_smooth.png)**
+- **:chatgpt-content-reference{index="2"}[Keyframe positions CSV](sandbox:/mnt/data/feast_20_smooth_positions.csv)**
+
+A couple of notes:
+
+- The basic **tear-drop shape definitely persists** at \(n=20\), but it becomes much more dramatic: the jugglers make much deeper inward excursions toward the center.
+- This version is best thought of as an **illustrative large-\(n\) solution**. The discrete beat positions are optimized, but the **continuous motion between beats** is not yet fully constrained for collision avoidance. In fact, when I sample the smoothed in-between motion, the minimum separation dips below the 6-foot target, so for \(n=20\) a truly realistic solution would need a stronger continuous-time movement model.
+- In other words: this is a good picture of the **geometry of the feast**, but not yet a final practical choreography for twenty bodies moving continuously.
+
+If you want, the next thing I’d suggest is one of these:
+
+1. **upgrade the optimization** so collisions are controlled *between* beats, not just at the beat positions; or  
+2. make a **comparison sheet / animation for \(n=8, 10, 12, 16, 20\)** so you can see exactly how the trace evolves as \(n\) grows.
+
+###
+I think there's trouble with n=20 case.   Going back to the basic optimization, I'd like there to be a single trace, which translated, rotated, and reused out of phase for each juggler. That might help reduce dimension and maybe get us a better answer with this larger n.  When n=8 it looks very realistic and symmetric.
+###
+
+I think you've identified the right mathematical simplification. The optimization should describe one juggler's closed trajectory, not twenty independently optimized trajectories. Every other juggler should follow an exact rotated copy, with the appropriate time shift.
+
+This enforces the rotational symmetry that made the eight-person solution so appealing.
+
+## 1. The single-trace formulation
+
+Let \\(\mathbf q(t)\\) be the trajectory of juggler 1, with periodicity
+
+\\[ \mathbf q(t+n)=\mathbf q(t). \\]
+
+Let \\(R(\theta)\\) be the usual two-dimensional rotation matrix. Then the trajectory of juggler \\(i\\) is
+
+\\[ \boxed{ \mathbf x_i(t)= R\left(-\frac{2\pi(i-1)}{n}\right) \mathbf q\big(t-2(i-1)\big). } \\]
+
+Here \\(t=0\\) is the first passing beat, and juggler 1 starts at the top of the circle after an overall rotation of the coordinate system.
+
+The phase shift of two beats per juggler is the crucial detail. It follows directly from your passing schedule.
+
+For \\(n=20\\), we now optimize only 20 two-dimensional points, or 40 coordinates, rather than the previous 800.
+
+More importantly, symmetry is guaranteed by construction, not merely encouraged by the objective function.
+
+## 2. The new symmetric 20-person feast
+
+Here is the resulting choreography. Every trace is now an exact rotated and phase-shifted copy of one master curve.
+
+Twenty-person symmetric feast showing smooth shared traces
+
+Watch the new symmetric 20-person GIF
+
+Longest pass
+
+# 7.77 ft
+
+Minimum separation
+
+# 6.17 ft
+
+Largest beat-to-beat move
+
+# 4.97 ft
+
+These are numerical results from the new model, using 7-foot spacing between adjacent home bases and 3-foot personal radii.
+
+Unlike the previous 20-person result, the new solution passed a much denser collision check along the interpolated trajectories. There are also no crossing passing lanes at the discrete passing beats.
+
+The 6.17-foot clearance is sampled rather than mathematically certified for every instant, and this remains a locally optimized solution rather than a proven global optimum.
+
+An interesting result is that the trajectories form a striking, symmetric flower-like arrangement. Each individual trace still has a pronounced inward excursion, but the full twenty-person geometry is quite different from the eight-person picture.
+
+## 3. Why this approach works better
+
+The key change is that the optimizer cannot give one juggler an advantageous position that breaks rotational symmetry. It must improve the single master trace, which automatically improves all twenty jugglers' trajectories.
+
+I retained the preference for radial movement, allowed more movement between passing beats, and included collision penalties sampled along the smooth trajectories themselves.
+
+The movement result is particularly relevant to your suggestion of an 8-count feast: a maximum displacement of approximately 5 feet between passing beats is much more reasonable with eight club releases available than with four. The appropriate count will also depend on tempo and how quickly the jugglers can comfortably change position.
+
+## 4. Code and data
+
+- Python optimization code — arbitrary \\(n\\)
+- The 20 points defining the master trace (CSV)
+- All 400 passing positions for the 20 jugglers (CSV)
+
+The Python code optimizes the master trace rather than the individual jugglers, and lets you try other values of \\(n\\).
+
+I think this is now the right mathematical foundation for the feast. The remaining challenge is less about finding symmetric geometry and more about understanding what makes a continuous trajectory physically comfortable: speed, acceleration, turning, and safe clearance while moving.
+
+One especially interesting next experiment would be to use this exact single-trace formulation for \\(n=8,10,12,16,20\\), with identical physical assumptions, and study how the master curve changes with \\(n\\). That would distinguish genuine geometric effects from artifacts of the earlier optimization.
