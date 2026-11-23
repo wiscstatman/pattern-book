@@ -274,3 +274,6 @@ Nov 18, 2026
 		larger diagonals, doing singles, doubles, then triples
 		for the madfest show, creative group is trying to have 2 boxes, inside one singles, 4cnt
 		outside one one doubles or triples and 4-count
+
+Nov 23, 26; I get gemini to draft a musical chairs pattern
+		https://share.gemini.google/Zy1hlSL8SlPl
