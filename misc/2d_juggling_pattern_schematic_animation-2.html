@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2D Juggling Pattern Schematic Animation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .blueprint-bg {
+      background-color: #f8fafc;
+      background-image:
+        linear-gradient(to right, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+        linear-gradient(to right, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+      background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Top Controls Header -->
+  <header class="bg-white border-b border-slate-200 px-4 py-3 sm:px-6 shadow-sm z-10">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+      <div>
+        <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+          Sliding-Vacancy All-to-All Juggling Pattern (<span id="headerTitleStats">M = 13, N = 25</span>)
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500">
+          Inner ring faces out • Outer ring faces in • Single traveling bubble mixes all N = 2M − 1 jugglers
+        </p>
+      </div>
+
+      <!-- Interactive Controls -->
+      <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+        <!-- Play / Pause, Step 1 Cycle & Reset -->
+        <div class="flex items-center gap-1.5 bg-slate-50 p-1 rounded-xl border border-slate-200">
+          <button id="playPauseBtn" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold transition shadow-sm cursor-pointer">
+            Pause
+          </button>
+          <button id="stepBtn" class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs sm:text-sm font-medium transition cursor-pointer" title="Advance exactly 1 six-beat cycle">
+            Step +1
+          </button>
+          <button id="resetBtn" class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs sm:text-sm font-medium transition cursor-pointer">
+            Reset
+          </button>
+        </div>
+
+        <!-- Stations Count M (12 to 20, default 13) -->
+        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+          <label for="stationSlider" class="text-xs font-semibold text-slate-600 whitespace-nowrap">
+            Stations (M): <span id="stationCountLabel" class="text-blue-700 font-bold">13</span>
+          </label>
+          <input id="stationSlider" type="range" min="12" max="20" value="13" step="1" class="w-20 sm:w-24 accent-blue-600 cursor-pointer" />
+        </div>
+
+        <!-- Speed Control (0.5x up to 20x fast-forward) -->
+        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+          <label for="speedSlider" class="text-xs font-semibold text-slate-600 whitespace-nowrap">
+            Speed: <span id="speedLabel" class="text-slate-800 font-bold">1.5x</span>
+          </label>
+          <input id="speedSlider" type="range" min="0.5" max="20" value="1.5" step="0.5" class="w-20 sm:w-24 accent-blue-600 cursor-pointer" />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto p-3 sm:p-5 gap-4 overflow-hidden">
+    
+    <!-- Left / Center Canvas Card -->
+    <div class="flex-1 bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col overflow-hidden min-h-[480px]">
+      <!-- Top Beat Banner -->
+      <div class="px-4 py-2.5 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5">
+          <span id="beatBadge" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+            BEAT 1: PASS (12 Active Pairs)
+          </span>
+          <span id="cycleCounter" class="text-xs font-semibold text-slate-600">Cycle 0</span>
+          <span id="vacancyBadge" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">
+            Vacancy: Station 1
+          </span>
+        </div>
+
+        <!-- 6-Beat Visual Indicator Pills -->
+        <div class="flex items-center gap-1" id="beatPills">
+          <span data-beat="1" class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold bg-amber-500 text-white shadow-sm">1</span>
+          <span data-beat="2" class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold bg-slate-200 text-slate-600">2</span>
+          <span data-beat="3" class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold bg-slate-200 text-slate-600">3</span>
+          <span data-beat="4" class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold bg-slate-200 text-slate-600">4</span>
+          <span data-beat="5" class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold bg-slate-200 text-slate-600">5</span>
+          <span data-beat="6" class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold bg-slate-200 text-slate-600">6</span>
+        </div>
+      </div>
+
+      <!-- Responsive Canvas Container -->
+      <div id="canvasContainer" class="relative flex-1 w-full blueprint-bg flex items-center justify-center overflow-hidden cursor-pointer">
+        <canvas id="simCanvas" class="block w-full h-full"></canvas>
+
+        <!-- Selected Juggler Inspector Pill (Bottom Left Overlay) -->
+        <div id="selectedInspector" class="absolute bottom-3 left-3 right-3 sm:right-auto bg-white/95 backdrop-blur-xs border border-slate-300 rounded-xl px-3.5 py-2 shadow-sm text-xs flex items-center justify-between gap-3">
+          <div>
+            <span class="font-bold text-slate-800" id="selectedTitle">Click any juggler dot (#1–#25) to track</span>
+            <div class="text-slate-500 mt-0.5" id="selectedSubtitle">Highlighted juggler turns gold; past partners get a green ring.</div>
+          </div>
+          <button id="clearSelectionBtn" class="hidden px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition cursor-pointer shrink-0">
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar: Pairwise Coverage, Matrix & Rule Explanation -->
+    <aside class="w-full lg:w-84 flex flex-col gap-3.5 shrink-0">
+      
+      <!-- All-to-All Pair Coverage Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">All-to-All Pair Coverage</h2>
+          <span id="coveragePercent" class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">0.0%</span>
+        </div>
+
+        <div class="flex items-baseline justify-between mb-1.5">
+          <div class="text-xl font-bold text-slate-900" id="metricPairsCount">0 / 300</div>
+          <div class="text-xs text-slate-500" id="metricJugglerFormula">N = 25 jugglers</div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/80 mb-2.5">
+          <div id="coverageBar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-150" style="width: 0%"></div>
+        </div>
+
+        <!-- Completion Milestone Status -->
+        <div id="completionBanner" class="text-xs rounded-xl px-3 py-2 bg-slate-50 border border-slate-200 text-slate-600">
+          In progress: use <strong class="text-slate-800">Speed 20x</strong> to watch 100% mixing complete.
+        </div>
+      </div>
+
+      <!-- Mini N x N Pairwise Interaction Matrix Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">N × N Pairwise Matrix</h2>
+          <span class="text-[11px] text-slate-500">Cell (i, j) = passed</span>
+        </div>
+        <div class="flex items-center justify-center bg-slate-50 rounded-xl p-2 border border-slate-200/80">
+          <canvas id="matrixCanvas" width="220" height="220" class="block rounded-md"></canvas>
+        </div>
+        <div class="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-indigo-600 inline-block"></span> Paired</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-amber-500 inline-block"></span> Active this beat</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-slate-200 inline-block"></span> Unmet</span>
+        </div>
+      </div>
+
+      <!-- Schematic Legend & Rule Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex-1">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Sliding-Vacancy Bubble Rule</h2>
+        <div id="ruleDescription" class="text-xs text-slate-600 leading-relaxed space-y-1.5">
+          <p>• <strong>Setup:</strong> <span class="font-semibold text-slate-800">N = 2M − 1</span> jugglers occupy <span class="font-semibold text-slate-800">M − 1</span> paired segments plus <strong>1 mover</strong> on the perimeter just clockwise of empty segment <em>k</em>.</p>
+          <p>• <strong>Beat 1 (Pass):</strong> All <span class="font-semibold text-slate-800">M − 1</span> facing pairs pass radially across their segments.</p>
+          <p>• <strong>Beats 2–6 (Bubble Shift):</strong> Vacancy shifts CCW (<em class="font-mono">k → k−1</em> mod <em>M</em>) with alternating inner/outer parity so every juggler visits both rings and meets all <span class="font-semibold text-slate-800">N − 1</span> partners.</p>
+        </div>
+      </div>
+
+    </aside>
+  </main>
+
+  <script>
+    /**
+     * Sliding-Vacancy All-to-All Juggling Pattern Simulation
+     * -------------------------------------------------------
+     * Geometry:
+     * - M stations around a central perimeter circle of radius R (default M = 13).
+     * - Station index i in {0, ..., M-1}:
+     *   Counterclockwise step is i -> (i - 1 + M) % M.
+     * - At Beat 1 of every cycle t:
+     *   - Exactly M - 1 stations are fully paired (Inner at R - 3.5 ft facing OUT, Outer at R + 3.5 ft facing IN).
+     *   - Exactly 1 station `vacancyIdx` is completely empty (both inner and outer vacant).
+     *   - Exactly 1 mover `moverJuggler` sits on the perimeter arc just clockwise of `vacancyIdx`
+     *     (specifically on arc `vacancyIdx`, which lies between station `vacancyIdx` and station `(vacancyIdx + 1) % M`,
+     *      so moving counterclockwise takes the mover directly across `vacancyIdx`!).
+     * - During Beats 2–6 of cycle t, the vacancy shifts counterclockwise from `k = vacancyIdx`
+     *   to `kNext = (k - 1 + M) % M`:
+     *   - On even cycles (t % 2 === 0):
+     *       1) `moverJuggler` steps CCW into `k_INNER`.
+     *       2) `outerSlots[kNext]` shifts clockwise into `k_OUTER`.
+     *       3) `innerSlots[kNext]` steps out onto perimeter arc `kNext` (becoming the new mover just CW of `kNext`).
+     *   - On odd cycles (t % 2 === 1):
+     *       1) `moverJuggler` steps CCW into `k_OUTER`.
+     *       2) `innerSlots[kNext]` shifts clockwise into `k_INNER`.
+     *       3) `outerSlots[kNext]` steps out onto perimeter arc `kNext` (becoming the new mover just CW of `kNext`).
+     *   - Result: Station `k` is now fully paired, station `kNext` is completely empty, and the new mover sits
+     *     on perimeter arc `kNext` ready for Cycle t + 1! Alternating parity swaps inner/outer roles every step,
+     *     generating a single transitive orbit that achieves 100% all-to-all pair coverage for M = 13 (N = 25).
+     */
+
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('canvasContainer');
+
+    const matrixCanvas = document.getElementById('matrixCanvas');
+    const mCtx = matrixCanvas.getContext('2d');
+
+    // UI Elements
+    const headerTitleStats = document.getElementById('headerTitleStats');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const stepBtn = document.getElementById('stepBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const stationSlider = document.getElementById('stationSlider');
+    const stationCountLabel = document.getElementById('stationCountLabel');
+    const speedSlider = document.getElementById('speedSlider');
+    const speedLabel = document.getElementById('speedLabel');
+    const beatBadge = document.getElementById('beatBadge');
+    const cycleCounterEl = document.getElementById('cycleCounter');
+    const vacancyBadge = document.getElementById('vacancyBadge');
+    const beatPills = document.querySelectorAll('#beatPills span');
+
+    // Coverage & Inspector Readouts
+    const coveragePercentEl = document.getElementById('coveragePercent');
+    const metricPairsCountEl = document.getElementById('metricPairsCount');
+    const metricJugglerFormulaEl = document.getElementById('metricJugglerFormula');
+    const coverageBarEl = document.getElementById('coverageBar');
+    const completionBannerEl = document.getElementById('completionBanner');
+    const selectedTitleEl = document.getElementById('selectedTitle');
+    const selectedSubtitleEl = document.getElementById('selectedSubtitle');
+    const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+
+    // Simulation Parameters & State
+    let numStations = 13; // Default M = 13 -> N = 25
+    let numJugglers = 25;
+    let isPlaying = true;
+    let speedMultiplier = 1.5;
+    let pauseAfterOneCycle = false;
+
+    // Cycle & phase state:
+    // cycleIndex: 0, 1, 2, ...
+    // cyclePhase in [0, 6):
+    //   [0, 1) -> Beat 1 (PASSING BEAT)
+    //   [1, 6) -> Beats 2–6 (BUBBLE SHIFT TRANSITION)
+    let cycleIndex = 0;
+    let cyclePhase = 0.0;
+    let lastTimestamp = null;
+    let hasPlannedCurrentShift = false;
+
+    // Board state
+    let innerSlots = []; // length M: null | jugglerId (1..N)
+    let outerSlots = []; // length M: null | jugglerId (1..N)
+    let vacancyIdx = 0;  // index of currently empty station (0..M-1)
+    let moverId = 1;     // jugglerId currently on perimeter arc `vacancyIdx`
+    let activeTransitions = []; // smooth animation paths for Beats 2–6
+    let lastRenderedPositions = []; // hit-testing cache for clicking jugglers
+
+    // Pairwise interaction tracking
+    let pairMatrix = []; // N x N boolean/count matrix (0-indexed internally for IDs 1..N)
+    let currentBeatPairs = []; // list of [idA, idB] passing on current Beat 1
+    let uniquePairsCount = 0;
+    let totalPossiblePairs = 300;
+    let allToAllCompletedCycle = null;
+
+    // Selected juggler for path/partner highlighting (null or 1..N)
+    let selectedJugglerId = null;
+
+    // Angle helpers: station 0 at top (-PI/2), increasing index clockwise,
+    // so counterclockwise motion decreases index: i -> (i - 1 + M) % M.
+    function stationAngle(i, m) {
+      return -Math.PI / 2 + (i * 2 * Math.PI) / m;
+    }
+
+    // Arc i lies between station i and station (i + 1) % M (just clockwise of station i)
+    function arcMidAngle(i, m) {
+      return -Math.PI / 2 + ((i + 0.5) * 2 * Math.PI) / m;
+    }
+
+    function lerpAngle(a0, a1, t) {
+      let diff = a1 - a0;
+      while (diff > Math.PI) diff -= 2 * Math.PI;
+      while (diff < -Math.PI) diff += 2 * Math.PI;
+      return a0 + diff * t;
+    }
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    /**
+     * Initialize simulation for M stations and N = 2M - 1 jugglers
+     */
+    function initSimulation(m) {
+      numStations = m;
+      numJugglers = 2 * m - 1;
+      totalPossiblePairs = (numJugglers * (numJugglers - 1)) / 2;
+
+      stationCountLabel.textContent = `${m}`;
+      headerTitleStats.textContent = `M = ${m}, N = ${numJugglers}`;
+      metricJugglerFormulaEl.textContent = `N = ${numJugglers} jugglers`;
+
+      cycleIndex = 0;
+      cyclePhase = 0.0;
+      hasPlannedCurrentShift = false;
+      pauseAfterOneCycle = false;
+      activeTransitions = [];
+      lastRenderedPositions = [];
+
+      // Reset pairwise matrix
+      pairMatrix = Array.from({ length: numJugglers }, () => new Uint16Array(numJugglers));
+      currentBeatPairs = [];
+      uniquePairsCount = 0;
+      allToAllCompletedCycle = null;
+
+      if (selectedJugglerId && selectedJugglerId > numJugglers) {
+        selectedJugglerId = null;
+      }
+
+      // Initial placement at Cycle 0, Beat 1:
+      // - Station 0 is completely empty (vacancyIdx = 0)
+      // - Juggler #1 is the perimeter mover on arc 0 (just clockwise of Station 0)
+      // - Stations 1 .. M-1 are paired with Jugglers #2 .. #(2M-1)
+      innerSlots = new Array(m).fill(null);
+      outerSlots = new Array(m).fill(null);
+      vacancyIdx = 0;
+      moverId = 1;
+
+      let nextId = 2;
+      for (let i = 1; i < m; i++) {
+        innerSlots[i] = nextId++;
+        outerSlots[i] = nextId++;
+      }
+
+      recordPassingBeat();
+      updateTelemetryUI();
+      renderMatrix();
+    }
+
+    /**
+     * Beat 1: Record all M - 1 radial passes between facing inner & outer pairs
+     */
+    function recordPassingBeat() {
+      currentBeatPairs = [];
+      for (let i = 0; i < numStations; i++) {
+        const a = innerSlots[i];
+        const b = outerSlots[i];
+        if (a !== null && b !== null) {
+          currentBeatPairs.push([a, b]);
+          const idxA = a - 1;
+          const idxB = b - 1;
+          if (pairMatrix[idxA][idxB] === 0) {
+            uniquePairsCount++;
+          }
+          pairMatrix[idxA][idxB] += 1;
+          pairMatrix[idxB][idxA] += 1;
+        }
+      }
+
+      if (uniquePairsCount === totalPossiblePairs && allToAllCompletedCycle === null) {
+        allToAllCompletedCycle = cycleIndex;
+      }
+    }
+
+    /**
+     * Beats 2–6: Execute one deterministic sliding-vacancy step counterclockwise:
+     * Vacancy moves from k = vacancyIdx to kNext = (k - 1 + M) % M.
+     * Even vs. odd cycle parity alternates which ring receives the mover vs. exits to perimeter.
+     */
+    function planBubbleShiftStep() {
+      const M = numStations;
+      const k = vacancyIdx;
+      const kNext = (k - 1 + M) % M;
+      const isEvenCycle = (cycleIndex % 2 === 0);
+
+      const nextInner = [...innerSlots];
+      const nextOuter = [...outerSlots];
+      const transitions = [];
+
+      const incomingMover = moverId;
+      const donorInner = innerSlots[kNext];
+      const donorOuter = outerSlots[kNext];
+
+      let nextMoverId = null;
+
+      if (isEvenCycle) {
+        // Even cycle:
+        // 1) Perimeter mover at arc k steps CCW into k_INNER
+        nextInner[k] = incomingMover;
+        transitions.push({
+          id: incomingMover,
+          fromRole: 'mover',
+          fromIndex: k,
+          toRole: 'inner',
+          toIndex: k
+        });
+
+        // 2) Outer juggler at kNext shifts clockwise into k_OUTER
+        nextOuter[k] = donorOuter;
+        transitions.push({
+          id: donorOuter,
+          fromRole: 'outer',
+          fromIndex: kNext,
+          toRole: 'outer',
+          toIndex: k
+        });
+
+        // 3) Inner juggler at kNext steps out onto perimeter arc kNext (just CW of kNext)
+        nextMoverId = donorInner;
+        transitions.push({
+          id: donorInner,
+          fromRole: 'inner',
+          fromIndex: kNext,
+          toRole: 'mover',
+          toIndex: kNext
+        });
+      } else {
+        // Odd cycle:
+        // 1) Perimeter mover at arc k steps CCW into k_OUTER
+        nextOuter[k] = incomingMover;
+        transitions.push({
+          id: incomingMover,
+          fromRole: 'mover',
+          fromIndex: k,
+          toRole: 'outer',
+          toIndex: k
+        });
+
+        // 2) Inner juggler at kNext shifts clockwise into k_INNER
+        nextInner[k] = donorInner;
+        transitions.push({
+          id: donorInner,
+          fromRole: 'inner',
+          fromIndex: kNext,
+          toRole: 'inner',
+          toIndex: k
+        });
+
+        // 3) Outer juggler at kNext steps out onto perimeter arc kNext (just CW of kNext)
+        nextMoverId = donorOuter;
+        transitions.push({
+          id: donorOuter,
+          fromRole: 'outer',
+          fromIndex: kNext,
+          toRole: 'mover',
+          toIndex: kNext
+        });
+      }
+
+      // Station kNext is now completely empty
+      nextInner[kNext] = null;
+      nextOuter[kNext] = null;
+
+      // All other stations stay in place
+      for (let i = 0; i < M; i++) {
+        if (i === k || i === kNext) continue;
+        if (nextInner[i] !== null) {
+          transitions.push({
+            id: nextInner[i],
+            fromRole: 'inner',
+            fromIndex: i,
+            toRole: 'inner',
+            toIndex: i
+          });
+        }
+        if (nextOuter[i] !== null) {
+          transitions.push({
+            id: nextOuter[i],
+            fromRole: 'outer',
+            fromIndex: i,
+            toRole: 'outer',
+            toIndex: i
+          });
+        }
+      }
+
+      innerSlots = nextInner;
+      outerSlots = nextOuter;
+      vacancyIdx = kNext;
+      moverId = nextMoverId;
+      activeTransitions = transitions;
+    }
+
+    /**
+     * Update Sidebar Telemetry, Progress Bar, and Selected Juggler Info
+     */
+    function updateTelemetryUI() {
+      const currentBeat = Math.floor(cyclePhase) + 1;
+      cycleCounterEl.textContent = `Cycle ${cycleIndex}`;
+      vacancyBadge.textContent = `Vacancy: Station ${vacancyIdx + 1}`;
+
+      if (currentBeat === 1) {
+        beatBadge.textContent = `BEAT 1: PASS (${numStations - 1} Active Pairs)`;
+        beatBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300';
+      } else {
+        beatBadge.textContent = `BEATS 2–6 (Beat ${currentBeat}): BUBBLE SHIFT`;
+        beatBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
+      }
+
+      beatPills.forEach(pill => {
+        const b = parseInt(pill.dataset.beat, 10);
+        if (b === currentBeat) {
+          pill.className = b === 1
+            ? 'w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold bg-amber-500 text-white shadow-sm scale-105 transition'
+            : 'w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold bg-emerald-600 text-white shadow-sm scale-105 transition';
+        } else {
+          pill.className = 'w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold bg-slate-200 text-slate-600 transition';
+        }
+      });
+
+      const pct = (uniquePairsCount / totalPossiblePairs) * 100;
+      coveragePercentEl.textContent = `${pct.toFixed(1)}%`;
+      metricPairsCountEl.textContent = `${uniquePairsCount} / ${totalPossiblePairs}`;
+      coverageBarEl.style.width = `${Math.min(100, pct)}%`;
+
+      if (allToAllCompletedCycle !== null) {
+        completionBannerEl.className = 'text-xs rounded-xl px-3 py-2 bg-emerald-50 border border-emerald-300 text-emerald-900 font-medium';
+        completionBannerEl.innerHTML = `<strong>100% All-to-All Achieved!</strong> Every juggler passed with all ${numJugglers - 1} others by <strong>Cycle ${allToAllCompletedCycle}</strong> (${allToAllCompletedCycle * 6} beats).`;
+      } else {
+        completionBannerEl.className = 'text-xs rounded-xl px-3 py-2 bg-slate-50 border border-slate-200 text-slate-600';
+        completionBannerEl.innerHTML = `In progress: slide <strong class="text-slate-800">Speed to 20x</strong> to watch 100% all-to-all mixing complete.`;
+      }
+
+      // Selected juggler inspector
+      if (selectedJugglerId !== null) {
+        const row = pairMatrix[selectedJugglerId - 1];
+        let partnersMet = 0;
+        let totalPasses = 0;
+        for (let j = 0; j < numJugglers; j++) {
+          if (j !== selectedJugglerId - 1 && row[j] > 0) {
+            partnersMet++;
+            totalPasses += row[j];
+          }
+        }
+        selectedTitleEl.textContent = `Tracking Juggler #${selectedJugglerId} — Met ${partnersMet} / ${numJugglers - 1} partners (${totalPasses} passes)`;
+        selectedSubtitleEl.textContent = `Gold dot = Juggler #${selectedJugglerId} • Emerald ring = partners already passed with.`;
+        clearSelectionBtn.classList.remove('hidden');
+      } else {
+        selectedTitleEl.textContent = `Click any juggler dot (#1–#${numJugglers}) to track`;
+        selectedSubtitleEl.textContent = `Highlighted juggler turns gold; past partners get a green ring.`;
+        clearSelectionBtn.classList.add('hidden');
+      }
+    }
+
+    /**
+     * Render the N x N Pairwise Adjacency Matrix on the right-hand mini canvas
+     */
+    function renderMatrix() {
+      const N = numJugglers;
+      const size = matrixCanvas.width;
+      mCtx.clearRect(0, 0, size, size);
+
+      const pad = 4;
+      const gridSize = size - pad * 2;
+      const cell = gridSize / N;
+
+      // Build lookup for active Beat 1 pairs
+      const activeSet = new Set();
+      if (cyclePhase < 1.0) {
+        for (const [a, b] of currentBeatPairs) {
+          activeSet.add(`${a - 1},${b - 1}`);
+          activeSet.add(`${b - 1},${a - 1}`);
+        }
+      }
+
+      for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
+          const x = pad + c * cell;
+          const y = pad + r * cell;
+
+          if (r === c) {
+            mCtx.fillStyle = '#94a3b8';
+          } else if (activeSet.has(`${r},${c}`)) {
+            mCtx.fillStyle = '#f59e0b'; // Active this beat
+          } else if (pairMatrix[r][c] > 0) {
+            // Highlight selected juggler's row/col brightly
+            if (selectedJugglerId !== null && (r === selectedJugglerId - 1 || c === selectedJugglerId - 1)) {
+              mCtx.fillStyle = '#10b981';
+            } else {
+              mCtx.fillStyle = '#4f46e5';
+            }
+          } else {
+            if (selectedJugglerId !== null && (r === selectedJugglerId - 1 || c === selectedJugglerId - 1)) {
+              mCtx.fillStyle = '#fef3c7';
+            } else {
+              mCtx.fillStyle = '#e2e8f0';
+            }
+          }
+
+          mCtx.fillRect(x + 0.4, y + 0.4, Math.max(1, cell - 0.8), Math.max(1, cell - 0.8));
+        }
+      }
+    }
+
+    /**
+     * Polar -> Cartesian slot coordinates
+     */
+    function getSlotCoords(role, index, cx, cy, R, halfSeg) {
+      if (role === 'inner') {
+        const theta = stationAngle(index, numStations);
+        const r = R - halfSeg;
+        return {
+          x: cx + r * Math.cos(theta),
+          y: cy + r * Math.sin(theta),
+          theta,
+          r,
+          facing: theta // Outward toward perimeter
+        };
+      } else if (role === 'outer') {
+        const theta = stationAngle(index, numStations);
+        const r = R + halfSeg;
+        return {
+          x: cx + r * Math.cos(theta),
+          y: cy + r * Math.sin(theta),
+          theta,
+          r,
+          facing: theta + Math.PI // Inward toward center
+        };
+      } else {
+        const theta = arcMidAngle(index, numStations);
+        const r = R;
+        return {
+          x: cx + r * Math.cos(theta),
+          y: cy + r * Math.sin(theta),
+          theta,
+          r,
+          facing: theta - Math.PI / 2 // Counterclockwise tangent
+        };
+      }
+    }
+
+    /**
+     * Draw a numbered juggler dot with directional facing cone & optional highlight halo
+     */
+    function drawJuggler(id, x, y, facingAngle, baseColor, radius) {
+      const isSelected = selectedJugglerId === id;
+      const isMetPartner =
+        selectedJugglerId !== null &&
+        !isSelected &&
+        pairMatrix[selectedJugglerId - 1][id - 1] > 0;
+
+      const fillColor = isSelected ? '#f59e0b' : baseColor;
+
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Partner or Selection Halo
+      if (isSelected) {
+        ctx.beginPath();
+        ctx.arc(0, 0, radius + 5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.28)';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#d97706';
+        ctx.stroke();
+      } else if (isMetPartner) {
+        ctx.beginPath();
+        ctx.arc(0, 0, radius + 3.5, 0, Math.PI * 2);
+        ctx.lineWidth = 2.2;
+        ctx.strokeStyle = '#10b981';
+        ctx.stroke();
+      }
+
+      // Drop shadow
+      ctx.beginPath();
+      ctx.arc(0, 1.5, radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.16)';
+      ctx.fill();
+
+      // Directional facing nose / cone
+      ctx.save();
+      ctx.rotate(facingAngle);
+      ctx.beginPath();
+      ctx.moveTo(radius + 6.5, 0);
+      ctx.lineTo(radius - 1.5, -5.2);
+      ctx.lineTo(radius - 1.5, 5.2);
+      ctx.closePath();
+      ctx.fillStyle = fillColor;
+      ctx.fill();
+      ctx.restore();
+
+      // Main circular body
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI * 2);
+      ctx.fillStyle = fillColor;
+      ctx.fill();
+      ctx.lineWidth = 1.8;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
+      // Juggler ID number (1..N)
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `700 ${id >= 10 ? 9 : 10}px Inter, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`${id}`, 0, 0.5);
+
+      ctx.restore();
+
+      // Cache screen coordinates for click-to-select
+      lastRenderedPositions.push({ id, x, y, radius });
+    }
+
+    /**
+     * Draw an in-flight juggling prop on Beat 1
+     */
+    function drawProp(x, y, angle) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 7.5, 4.2, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.32)';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 5, 2.5, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fill();
+      ctx.lineWidth = 1.1;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    /**
+     * Render the 2D top-down schematic onto HTML5 Canvas
+     */
+    function render() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = container.getBoundingClientRect();
+      if (canvas.width !== Math.round(rect.width * dpr) || canvas.height !== Math.round(rect.height * dpr)) {
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = Math.round(rect.height * dpr);
+      }
+
+      lastRenderedPositions = [];
+
+      ctx.save();
+      ctx.scale(dpr, dpr);
+
+      const W = rect.width;
+      const H = rect.height;
+      ctx.clearRect(0, 0, W, H);
+
+      const cx = W / 2;
+      const cy = H / 2 - 10;
+
+      // True-to-scale geometry: 6 ft arc spacing -> R_ft = (M * 6) / (2 * PI), half-segment = 3.5 ft
+      const rFt = (numStations * 6.0) / (2 * Math.PI);
+      const halfSegFt = 3.5;
+      const maxDrawableRadius = Math.min(W, H - 36) * 0.43;
+      const pxPerFt = maxDrawableRadius / (rFt + halfSegFt + 2.0);
+
+      const R = rFt * pxPerFt;
+      const halfSeg = halfSegFt * pxPerFt;
+      const innerR = R - halfSeg;
+      const outerR = R + halfSeg;
+
+      // 1. Concentric dashed guide rings (Inner Ring at R - 3.5 ft, Outer Ring at R + 3.5 ft)
+      ctx.save();
+      ctx.setLineDash([4, 5]);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(100, 116, 139, 0.32)';
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
+      // 2. Central Perimeter Circle (Walking / Shunting Lane between Inner & Outer Rings)
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(30, 58, 138, 0.18)';
+      ctx.lineWidth = 11;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.strokeStyle = '#1e3a8a';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([7, 5]);
+      ctx.stroke();
+      ctx.restore();
+
+      // Counterclockwise lane chevrons
+      for (let q = 0; q < 4; q++) {
+        const a = (q * Math.PI) / 2 + Math.PI / 4;
+        ctx.save();
+        ctx.translate(cx + R * Math.cos(a), cy + R * Math.sin(a));
+        ctx.rotate(a - Math.PI / 2);
+        ctx.beginPath();
+        ctx.moveTo(6, 0);
+        ctx.lineTo(-3, -4);
+        ctx.lineTo(-3, 4);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(30, 58, 138, 0.42)';
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Center crosshair & scale annotation
+      ctx.save();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(cx - 9, cy);
+      ctx.lineTo(cx + 9, cy);
+      ctx.moveTo(cx, cy - 9);
+      ctx.lineTo(cx, cy + 9);
+      ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '500 11px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`M = ${numStations} segments (7 ft radial)`, cx, cy + 21);
+      ctx.fillText(`N = ${numJugglers} jugglers • CCW Bubble`, cx, cy + 35);
+      ctx.restore();
+
+      const isPassingBeat = cyclePhase < 1.0;
+
+      // 3. Draw 7-ft Radial Segments centered on Red Perimeter Marks & Empty Spot Rings
+      for (let i = 0; i < numStations; i++) {
+        const theta = stationAngle(i, numStations);
+        const cosT = Math.cos(theta);
+        const sinT = Math.sin(theta);
+
+        const xIn = cx + innerR * cosT;
+        const yIn = cy + innerR * sinT;
+        const xOut = cx + outerR * cosT;
+        const yOut = cy + outerR * sinT;
+        const xMark = cx + R * cosT;
+        const yMark = cy + R * sinT;
+
+        const isEmptyStation = isPassingBeat && i === vacancyIdx;
+        const isPairedStation = isPassingBeat && innerSlots[i] !== null && outerSlots[i] !== null;
+
+        // Subtle highlight behind the empty "bubble" station
+        if (isEmptyStation) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(xIn, yIn);
+          ctx.lineTo(xOut, yOut);
+          ctx.strokeStyle = 'rgba(244, 63, 94, 0.22)';
+          ctx.lineWidth = 22;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Radial 7-ft line segment
+        ctx.beginPath();
+        ctx.moveTo(xIn, yIn);
+        ctx.lineTo(xOut, yOut);
+        ctx.strokeStyle = isPairedStation ? '#f59e0b' : (isEmptyStation ? '#e11d48' : '#475569');
+        ctx.lineWidth = isPairedStation ? 3.4 : 2.2;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // Red perimeter mark at exact center of the 7-ft segment
+        ctx.beginPath();
+        ctx.arc(xMark, yMark, 3.6, 0, Math.PI * 2);
+        ctx.fillStyle = '#dc2626';
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+
+        // Inner & Outer dashed endpoint sockets
+        for (const [sx, sy] of [[xIn, yIn], [xOut, yOut]]) {
+          ctx.beginPath();
+          ctx.arc(sx, sy, 11, 0, Math.PI * 2);
+          ctx.fillStyle = isEmptyStation ? 'rgba(255, 241, 242, 0.95)' : 'rgba(255, 255, 255, 0.88)';
+          ctx.fill();
+          ctx.save();
+          ctx.setLineDash([3, 3]);
+          ctx.strokeStyle = isEmptyStation ? '#fb7185' : '#94a3b8';
+          ctx.lineWidth = 1.3;
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Station label outside outer endpoint
+        const labelR = outerR + 21;
+        ctx.fillStyle = isEmptyStation ? '#be123c' : '#64748b';
+        ctx.font = `${isEmptyStation ? '700' : '600'} 10.5px Inter, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`${i + 1}`, cx + labelR * cosT, cy + labelR * sinT);
+      }
+
+      // 4. Draw Jugglers & In-Flight Passes
+      const jugglerRadius = Math.max(9, Math.min(11.5, R * 0.068));
+
+      if (isPassingBeat) {
+        for (let i = 0; i < numStations; i++) {
+          if (innerSlots[i] !== null) {
+            const pos = getSlotCoords('inner', i, cx, cy, R, halfSeg);
+            drawJuggler(innerSlots[i], pos.x, pos.y, pos.facing, '#4f46e5', jugglerRadius);
+          }
+          if (outerSlots[i] !== null) {
+            const pos = getSlotCoords('outer', i, cx, cy, R, halfSeg);
+            drawJuggler(outerSlots[i], pos.x, pos.y, pos.facing, '#0d9488', jugglerRadius);
+          }
+        }
+
+        // Single perimeter mover sitting on arc `vacancyIdx`
+        const moverPos = getSlotCoords('mover', vacancyIdx, cx, cy, R, halfSeg);
+        drawJuggler(moverId, moverPos.x, moverPos.y, moverPos.facing, '#10b981', jugglerRadius);
+
+        // Animate radial passes flying both ways across all M - 1 paired segments
+        const passT = cyclePhase; // 0 -> 1
+        for (let i = 0; i < numStations; i++) {
+          if (innerSlots[i] !== null && outerSlots[i] !== null) {
+            const pIn = getSlotCoords('inner', i, cx, cy, R, halfSeg);
+            const pOut = getSlotCoords('outer', i, cx, cy, R, halfSeg);
+            const theta = stationAngle(i, numStations);
+            const perpX = -Math.sin(theta) * 4.2;
+            const perpY = Math.cos(theta) * 4.2;
+
+            drawProp(
+              pIn.x + (pOut.x - pIn.x) * passT + perpX,
+              pIn.y + (pOut.y - pIn.y) * passT + perpY,
+              theta + passT * Math.PI * 2
+            );
+            drawProp(
+              pOut.x + (pIn.x - pOut.x) * passT - perpX,
+              pOut.y + (pIn.y - pOut.y) * passT - perpY,
+              theta - passT * Math.PI * 2
+            );
+          }
+        }
+      } else {
+        // Beats 2–6: Smoothly interpolate all jugglers through the sliding-vacancy bubble shift
+        const moveT = easeInOutCubic((cyclePhase - 1.0) / 5.0);
+
+        for (const tr of activeTransitions) {
+          const start = getSlotCoords(tr.fromRole, tr.fromIndex, cx, cy, R, halfSeg);
+          const end = getSlotCoords(tr.toRole, tr.toIndex, cx, cy, R, halfSeg);
+
+          const curR = start.r + (end.r - start.r) * moveT;
+          const curTheta = lerpAngle(start.theta, end.theta, moveT);
+          const x = cx + curR * Math.cos(curTheta);
+          const y = cy + curR * Math.sin(curTheta);
+          const curFacing = lerpAngle(start.facing, end.facing, moveT);
+
+          let color = '#10b981';
+          if (tr.toRole === 'inner') color = '#4f46e5';
+          else if (tr.toRole === 'outer') color = '#0d9488';
+
+          drawJuggler(tr.id, x, y, curFacing, color, jugglerRadius);
+        }
+      }
+
+      ctx.restore();
+    }
+
+    /**
+     * Advance simulation clock cleanly (supports high fast-forward speeds up to 20x)
+     */
+    function stepSimulationClock(deltaBeats) {
+      let remaining = deltaBeats;
+      let matrixDirty = false;
+
+      while (remaining > 0) {
+        if (cyclePhase < 1.0) {
+          const toShift = 1.0 - cyclePhase;
+          if (remaining >= toShift) {
+            cyclePhase = 1.0;
+            remaining -= toShift;
+            if (!hasPlannedCurrentShift) {
+              planBubbleShiftStep();
+              hasPlannedCurrentShift = true;
+            }
+          } else {
+            cyclePhase += remaining;
+            remaining = 0;
+          }
+        } else {
+          const toNextCycle = 6.0 - cyclePhase;
+          if (remaining >= toNextCycle) {
+            cyclePhase = 0.0;
+            remaining -= toNextCycle;
+            cycleIndex += 1;
+            hasPlannedCurrentShift = false;
+            recordPassingBeat();
+            matrixDirty = true;
+
+            if (pauseAfterOneCycle) {
+              pauseAfterOneCycle = false;
+              isPlaying = false;
+              updatePlayButtonUI();
+              remaining = 0;
+            }
+          } else {
+            cyclePhase += remaining;
+            remaining = 0;
+          }
+        }
+      }
+
+      updateTelemetryUI();
+      if (matrixDirty) {
+        renderMatrix();
+      }
+    }
+
+    function updatePlayButtonUI() {
+      playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
+      playPauseBtn.className = isPlaying
+        ? 'px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold transition shadow-sm cursor-pointer'
+        : 'px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold transition shadow-sm cursor-pointer';
+    }
+
+    function animate(timestamp) {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const dt = Math.min(0.1, (timestamp - lastTimestamp) / 1000);
+      lastTimestamp = timestamp;
+
+      if (isPlaying) {
+        const baseBeatsPerSec = 2.4;
+        stepSimulationClock(dt * baseBeatsPerSec * speedMultiplier);
+      }
+
+      render();
+      requestAnimationFrame(animate);
+    }
+
+    // Interactive Controls
+    playPauseBtn.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      pauseAfterOneCycle = false;
+      updatePlayButtonUI();
+    });
+
+    stepBtn.addEventListener('click', () => {
+      // Advance cleanly to the start of the next cycle's Beat 1
+      const beatsToNextCycle = 6.0 - cyclePhase;
+      stepSimulationClock(beatsToNextCycle);
+      isPlaying = false;
+      pauseAfterOneCycle = false;
+      updatePlayButtonUI();
+      render();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      initSimulation(numStations);
+      render();
+    });
+
+    stationSlider.addEventListener('input', (e) => {
+      const m = parseInt(e.target.value, 10);
+      initSimulation(m);
+      render();
+    });
+
+    speedSlider.addEventListener('input', (e) => {
+      speedMultiplier = parseFloat(e.target.value);
+      speedLabel.textContent = `${speedMultiplier.toFixed(1)}x`;
+    });
+
+    // Click on a juggler dot on the canvas to highlight them and their met partners
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      let closest = null;
+      let bestDist = 22; // generous click target radius
+      for (const item of lastRenderedPositions) {
+        const d = Math.hypot(item.x - clickX, item.y - clickY);
+        if (d < bestDist) {
+          bestDist = d;
+          closest = item.id;
+        }
+      }
+
+      if (closest !== null) {
+        selectedJugglerId = selectedJugglerId === closest ? null : closest;
+        updateTelemetryUI();
+        renderMatrix();
+        render();
+      }
+    });
+
+    clearSelectionBtn.addEventListener('click', () => {
+      selectedJugglerId = null;
+      updateTelemetryUI();
+      renderMatrix();
+      render();
+    });
+
+    window.addEventListener('resize', render);
+
+    window.onload = function () {
+      initSimulation(13);
+      updatePlayButtonUI();
+      requestAnimationFrame(animate);
+    };
+  </script>
+</body>
+</html>

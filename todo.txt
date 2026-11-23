@@ -277,3 +277,5 @@ Nov 18, 2026
 
 Nov 23, 26; I get gemini to draft a musical chairs pattern
 		https://share.gemini.google/Zy1hlSL8SlPl
+
+		https://share.gemini.google/jP4kiDwcdOuc
