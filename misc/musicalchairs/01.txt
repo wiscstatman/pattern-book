@@ -1,0 +1,60 @@
+Here is a clean, human-friendly summary of the motion and passing rules that drive this pattern—designed so any juggler in the circle only needs to track their own immediate state without remembering past partners or global counts:
+
+### 1. Spatial Layout & Roles
+
+* **The Circle & Stations:** $M$ radial segments (e.g., $M = 19$) are spaced evenly around a circular perimeter lane, each extending $3.5\text{ ft}$ inside and $3.5\text{ ft}$ outside the circle.
+* **Three Positions:** At each passing beat, every juggler is in one of three states:
+1. **Inner Passer:** Standing at the inner end of a segment, facing **radially outward**.
+2. **Outer Passer:** Standing at the outer end of a segment, facing **radially inward**.
+3. **Perimeter Mover:** Standing on the circular lane midpoint between two segments, facing **counterclockwise (CCW)**.
+
+
+
+---
+
+### 2. The 6-Beat Cycle
+
+* **Beat 1 (Passing Beat):**
+* **Paired segments** (where both the Inner and Outer ends are occupied) exchange a radial pass across the lane, and both jugglers increment their personal pass count in that spot.
+* **Solo passers** (whose opposite segment end is empty) hold their spot, do a self-throw, and wait for a partner.
+* **Perimeter movers** do a self-throw in place.
+
+
+* **Beats 2–6 (Movement Window):**
+* All exits, entries, and perimeter advances happen during these 5 non-passing beats, and **every single move goes strictly counterclockwise (forward)**—no one ever steps backward.
+
+
+
+---
+
+### 3. Individual Juggler Motion Rules (Zero Partner Memory Required)
+
+Each juggler only needs to keep track of two personal pieces of information: **how many passes** they have made in their current spot, and **which ring (`Inner` or `Outer`)** they should enter next.
+
+1. **Staying Put Until the Minimum Pass Quota ($k \ge 2$):**
+* Once seated at an Inner or Outer spot, you **stay in place** until you have completed at least **$k$ radial passes** (e.g., $k = 2$) with a partner across your segment. (If you don't have a partner yet, you wait until one arrives.)
+
+
+2. **Forward-Only Exit & Ring Flip:**
+* Once you have completed at least $k$ passes at station $i$, you look forward (counterclockwise) to the perimeter arc just past your segment.
+* If that perimeter spot is open, you step **forward (counterclockwise)** onto the perimeter lane and **flip your target ring** for your next stint:
+* If you exited from the **Inner** ring, you seek an **Outer** spot next.
+* If you exited from the **Outer** ring, you seek an **Inner** spot next.
+
+
+* *(If both partners at a segment reach $k$ passes at the same time and only one exit spot is open ahead, one steps out first and the other follows on the next cycle.)*
+
+
+3. **Stochastic Entry vs. Counterclockwise Cruise:**
+* As you travel **counterclockwise** along the perimeter lane, each cycle brings you up to the radial segment immediately ahead of you:
+* **If your target slot (`Inner` or `Outer`) at that segment is open:** Flip a mental coin—with probability $p$ (e.g., **60%**), step **forward (counterclockwise)** into that spot and start a fresh pass count; otherwise, pass it by and keep cruising.
+* **If your target slot is occupied (or you chose to pass it by):** Advance **forward (counterclockwise)** by one arc along the perimeter (or pause in place for one cycle if the arc directly ahead is occupied).
+
+
+
+
+
+### Why These Rules Guarantee All-to-All Passing
+
+* **No Ring Segregation:** Flipping between `Inner` and `Outer` after every stint guarantees every juggler plays both sides of the lane, so no two jugglers are permanently stuck on the same side.
+* **No Phase-Locking:** Using a prime/coprime station count ($M = 19$) together with the memoryless coin-flip entry breaks up any rigid conveyor lockstep, ensuring every juggler eventually pairs up with all $N - 1$ others.

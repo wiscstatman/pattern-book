@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>High-Turnover All-to-All Juggling Animation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .blueprint-bg {
+      background-color: #f8fafc;
+      background-image:
+        linear-gradient(to right, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+        linear-gradient(to right, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+      background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Top Controls Header -->
+  <header class="bg-white border-b border-slate-200 px-4 py-3 sm:px-6 shadow-sm z-10">
+    <div class="max-w-7xl mx-auto flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+      <div>
+        <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+          Strictly CCW All-to-All Juggling Pattern (<span id="headerTitleStats">M = 19, N = 28</span>)
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500">
+          Zero backtracking (strictly CCW) • Min passes before exit • Lane-flipping movers mix all N jugglers
+        </p>
+      </div>
+
+      <!-- Interactive Controls -->
+      <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+        <!-- Play / Pause, Step 1 Cycle & Reset -->
+        <div class="flex items-center gap-1.5 bg-slate-50 p-1 rounded-xl border border-slate-200">
+          <button id="playPauseBtn" type="button" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold transition shadow-sm cursor-pointer">
+            Pause
+          </button>
+          <button id="stepBtn" type="button" class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs sm:text-sm font-medium transition cursor-pointer" title="Advance exactly 1 six-beat cycle">
+            Step +1
+          </button>
+          <button id="resetBtn" type="button" class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs sm:text-sm font-medium transition cursor-pointer">
+            Reset
+          </button>
+        </div>
+
+        <!-- Stint Quota Toggle: 1, 2, or 3 Minimal Passes -->
+        <div class="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-200" role="group" aria-label="Minimal Passes Before Moving">
+          <span class="text-[11px] font-semibold text-slate-500 px-1.5">Min Passes:</span>
+          <button id="quota1Btn" type="button" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-200/70 transition cursor-pointer">
+            1
+          </button>
+          <button id="quota2Btn" type="button" class="px-2 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs transition cursor-pointer">
+            2
+          </button>
+          <button id="quota3Btn" type="button" class="px-2 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-200/70 transition cursor-pointer">
+            3
+          </button>
+        </div>
+
+        <!-- Stations Count M (13 to 28, default 19) -->
+        <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200">
+          <label for="stationSlider" class="text-xs font-semibold text-slate-600 whitespace-nowrap">
+            Stations (M): <span id="stationCountLabel" class="text-blue-700 font-bold">19</span>
+          </label>
+          <input id="stationSlider" type="range" min="12" max="28" value="19" step="1" class="w-16 sm:w-20 accent-blue-600 cursor-pointer" />
+        </div>
+
+        <!-- Jugglers Count N (24 to 42, default 28) -->
+        <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200">
+          <label for="jugglerSlider" class="text-xs font-semibold text-slate-600 whitespace-nowrap">
+            Jugglers (N): <span id="jugglerCountLabel" class="text-indigo-700 font-bold">28</span>
+          </label>
+          <input id="jugglerSlider" type="range" min="24" max="42" value="28" step="1" class="w-16 sm:w-20 accent-indigo-600 cursor-pointer" />
+        </div>
+
+        <!-- Stochastic Entry Probability (20% to 100%, default 65%) -->
+        <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200">
+          <label for="entryProbSlider" class="text-xs font-semibold text-slate-600 whitespace-nowrap">
+            Step-In Prob: <span id="entryProbLabel" class="text-emerald-700 font-bold">65%</span>
+          </label>
+          <input id="entryProbSlider" type="range" min="20" max="100" value="65" step="5" class="w-16 sm:w-20 accent-emerald-600 cursor-pointer" />
+        </div>
+
+        <!-- Speed Control (0.5x up to 20x fast-forward) -->
+        <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200">
+          <label for="speedSlider" class="text-xs font-semibold text-slate-600 whitespace-nowrap">
+            Speed: <span id="speedLabel" class="text-slate-800 font-bold">1.5x</span>
+          </label>
+          <input id="speedSlider" type="range" min="0.5" max="20" value="1.5" step="0.5" class="w-16 sm:w-20 accent-blue-600 cursor-pointer" />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto p-3 sm:p-5 gap-4 overflow-hidden">
+    
+    <!-- Left / Center Canvas Card -->
+    <div class="flex-1 bg-white rounded-2xl shadow-md border border-slate-200 flex flex-col overflow-hidden min-h-[540px]">
+      <!-- Top Beat Banner -->
+      <div class="px-4 py-2.5 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <span id="beatBadge" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+            BEAT 1: PASS (11 Active Pairs)
+          </span>
+          <span id="cycleCounter" class="text-xs font-semibold text-slate-600">Cycle 0</span>
+          <span id="roleBreakdownBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
+            22 Stationed (11 Pairs) • 6 Movers
+          </span>
+          <span id="ccwVerifyBadge" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+            0 Backtracks (100% CCW)
+          </span>
+        </div>
+
+        <!-- 6-Beat Visual Indicator Pills -->
+        <div class="flex items-center gap-1" id="beatPills">
+          <span data-beat="1" class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold bg-amber-500 text-white shadow-sm">1</span>
+          <span data-beat="2" class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold bg-slate-200 text-slate-600">2</span>
+          <span data-beat="3" class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold bg-slate-200 text-slate-600">3</span>
+          <span data-beat="4" class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold bg-slate-200 text-slate-600">4</span>
+          <span data-beat="5" class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold bg-slate-200 text-slate-600">5</span>
+          <span data-beat="6" class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold bg-slate-200 text-slate-600">6</span>
+        </div>
+      </div>
+
+      <!-- Responsive Canvas Container -->
+      <div id="canvasContainer" class="relative flex-1 w-full min-h-[540px] blueprint-bg flex items-center justify-center overflow-hidden cursor-pointer">
+        <canvas id="simCanvas" width="760" height="580" class="block w-full h-full"></canvas>
+
+        <!-- Role Legend Overlay (Top Left of Canvas) -->
+        <div class="hidden sm:flex flex-col gap-1.5 absolute top-3 left-3 bg-white/90 border border-slate-200/90 rounded-xl px-3 py-2 text-[11px] text-slate-700 shadow-xs pointer-events-none">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 inline-block"></span>
+            <span><strong>Inner Ring</strong> (R − 3.5 ft, faces out)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-teal-600 inline-block"></span>
+            <span><strong>Outer Ring</strong> (R + 3.5 ft, faces in)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+            <span><strong>Mover</strong> (CCW lane • tag = next ring)</span>
+          </div>
+        </div>
+
+        <!-- Selected Juggler Inspector Pill (Bottom Left Overlay) -->
+        <div id="selectedInspector" class="absolute bottom-3 left-3 right-3 sm:right-auto bg-white/95 border border-slate-300 rounded-xl px-3.5 py-2 shadow-sm text-xs flex items-center justify-between gap-3">
+          <div>
+            <span class="font-bold text-slate-800" id="selectedTitle">Click any juggler dot (#1–#28) or matrix row to track</span>
+            <div class="text-slate-500 mt-0.5" id="selectedSubtitle">Highlighted juggler turns gold; past partners get a green ring.</div>
+          </div>
+          <button id="clearSelectionBtn" type="button" class="hidden px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition cursor-pointer shrink-0">
+            Clear
+          </button>
+        </div>
+
+        <!-- On-Canvas Who-Passes-to-Who N x N Matrix Card (Top Right Overlay) -->
+        <div class="absolute top-3 right-3 bg-white/95 backdrop-blur-xs border border-slate-300/90 rounded-xl p-2.5 shadow-md flex flex-col items-center z-10">
+          <div class="w-full flex items-center justify-between gap-2 mb-1.5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600">Who-Passes-to-Who</span>
+            <span id="overlayMatrixPct" class="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded-full border border-indigo-200">0.0%</span>
+          </div>
+          <canvas id="overlayMatrixCanvas" width="148" height="148" class="block rounded-sm border border-slate-200 cursor-pointer" title="Click any row/column to inspect a juggler"></canvas>
+          <div id="overlayMatrixHover" class="mt-1 text-[10px] font-medium text-slate-500 text-center max-w-[148px] truncate">
+            Click cell to inspect pair
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar: Pairwise Coverage, Matrix & Rule Explanation -->
+    <aside class="w-full lg:w-80 flex flex-col gap-3.5 shrink-0">
+
+      <!-- All-to-All Pair Coverage Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">All-to-All Pair Coverage</h2>
+          <span id="coveragePercent" class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">0.0%</span>
+        </div>
+
+        <div class="flex items-baseline justify-between mb-1.5">
+          <div class="text-xl font-bold text-slate-900" id="metricPairsCount">0 / 378</div>
+          <div class="text-xs text-slate-500" id="metricJugglerFormula">N = 28 jugglers</div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/80 mb-2.5">
+          <div id="coverageBar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-150" style="width: 0%"></div>
+        </div>
+
+        <!-- Completion Milestone Status -->
+        <div id="completionBanner" class="text-xs rounded-xl px-3 py-2 bg-slate-50 border border-slate-200 text-slate-600">
+          In progress: slide <strong class="text-slate-800">Speed to 20x</strong> to watch 100% mixing complete.
+        </div>
+      </div>
+
+      <!-- Mini N x N Pairwise Interaction Matrix Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">N × N Pairwise Matrix</h2>
+          <span class="text-[11px] text-slate-500">Cell (i, j) = passed</span>
+        </div>
+        <div class="flex items-center justify-center bg-slate-50 rounded-xl p-2 border border-slate-200/80">
+          <canvas id="matrixCanvas" width="220" height="220" class="block rounded-md"></canvas>
+        </div>
+        <div class="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-indigo-600 inline-block"></span> Paired</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-amber-500 inline-block"></span> Active this beat</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-slate-200 inline-block"></span> Unmet</span>
+        </div>
+      </div>
+
+      <!-- Schematic Legend & Rule Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex-1">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Memoryless Stochastic Rules</h2>
+        <div id="ruleDescription" class="text-xs text-slate-600 leading-relaxed space-y-1.5">
+          <p>• <strong>Beat 1 (Pass):</strong> Paired segments exchange radial passes and increment each occupant's <span class="font-mono text-[11px] bg-slate-100 px-1 rounded">passesInSlot</span>. Solo occupants hold their spot until paired.</p>
+          <p>• <strong>Forward-Only Exit (Beats 2–6):</strong> After completing <strong id="ruleMinPassesText" class="text-slate-800">2 passes</strong>, a juggler steps strictly <strong>CCW</strong> onto arc <span class="font-mono text-[11px] bg-slate-100 px-1 rounded">(i − 1) mod M</span> (never backward) and switches target ring (<span class="font-mono text-[11px]">I ↔ O</span>).</p>
+          <p>• <strong>Memoryless Stochastic Entry:</strong> No partner memory needed—when a mover reaches an open slot in their target ring, they step in with probability <strong id="ruleEntryProbText" class="text-emerald-700">65%</strong>, or keep cruising <strong>CCW</strong> otherwise.</p>
+        </div>
+      </div>
+
+    </aside>
+  </main>
+
+  <script>
+    /**
+     * Strictly Counterclockwise All-to-All Musical-Chairs Juggling Simulation
+     * -----------------------------------------------------------------------
+     * - M stations indexed i = 0 .. M-1 clockwise from top (-PI/2).
+     * - Counterclockwise progression decreases station index: i -> (i - 1 + M) % M.
+     * - Perimeter arc `a` sits midway between station `a` and station `(a + 1) % M`.
+     * - Every move has strictly non-positive angular displacement (deltaTheta <= 0):
+     *     1) Entry from arc `a` -> station `a` (inner or outer): deltaTheta = -PI / M (CCW).
+     *     2) Perimeter advance from arc `a` -> arc `(a - 1 + M) % M`: deltaTheta = -2 * PI / M (CCW).
+     *     3) Exit from station `i` (inner or outer) -> arc `(i - 1 + M) % M`: deltaTheta = -PI / M (CCW).
+     */
+
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('canvasContainer');
+
+    const matrixCanvas = document.getElementById('matrixCanvas');
+    const mCtx = matrixCanvas.getContext('2d');
+    const overlayMatrixCanvas = document.getElementById('overlayMatrixCanvas');
+    const omCtx = overlayMatrixCanvas.getContext('2d');
+    const overlayMatrixPct = document.getElementById('overlayMatrixPct');
+    const overlayMatrixHover = document.getElementById('overlayMatrixHover');
+
+    // UI Elements
+    const headerTitleStats = document.getElementById('headerTitleStats');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const stepBtn = document.getElementById('stepBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const stationSlider = document.getElementById('stationSlider');
+    const stationCountLabel = document.getElementById('stationCountLabel');
+    const jugglerSlider = document.getElementById('jugglerSlider');
+    const jugglerCountLabel = document.getElementById('jugglerCountLabel');
+    const entryProbSlider = document.getElementById('entryProbSlider');
+    const entryProbLabel = document.getElementById('entryProbLabel');
+    const quota1Btn = document.getElementById('quota1Btn');
+    const quota2Btn = document.getElementById('quota2Btn');
+    const quota3Btn = document.getElementById('quota3Btn');
+    const speedSlider = document.getElementById('speedSlider');
+    const speedLabel = document.getElementById('speedLabel');
+
+    const beatBadge = document.getElementById('beatBadge');
+    const cycleCounterEl = document.getElementById('cycleCounter');
+    const roleBreakdownBadge = document.getElementById('roleBreakdownBadge');
+    const ccwVerifyBadge = document.getElementById('ccwVerifyBadge');
+    const ruleMinPassesText = document.getElementById('ruleMinPassesText');
+    const ruleEntryProbText = document.getElementById('ruleEntryProbText');
+    const beatPills = document.querySelectorAll('#beatPills span');
+
+    // Coverage & Inspector Readouts
+    const coveragePercentEl = document.getElementById('coveragePercent');
+    const metricPairsCountEl = document.getElementById('metricPairsCount');
+    const metricJugglerFormulaEl = document.getElementById('metricJugglerFormula');
+    const coverageBarEl = document.getElementById('coverageBar');
+    const completionBannerEl = document.getElementById('completionBanner');
+    const selectedTitleEl = document.getElementById('selectedTitle');
+    const selectedSubtitleEl = document.getElementById('selectedSubtitle');
+    const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+
+    // Simulation Parameters & State
+    let numStations = 19;    // Default M = 19 (prime, fits 24-42 jugglers cleanly)
+    let numJugglers = 28;    // Default N = 28 (range 24 to 42)
+    let minPasses = 2;       // Minimal passes required in a position before moving (default 2)
+    let entryProbability = 0.65; // Memoryless probability of stepping into an eligible target slot
+    let isPlaying = true;
+    let speedMultiplier = 1.5;
+    let pauseAfterOneCycle = false;
+    let totalBacktracks = 0; // Runtime invariant counter (always 0)
+
+    // Cycle & phase state: cyclePhase in [0, 6)
+    // [0, 1) -> Beat 1 (PASSING BEAT)
+    // [1, 6) -> Beats 2–6 (CCW MOVEMENT)
+    let cycleIndex = 0;
+    let cyclePhase = 0.0;
+    let lastTimestamp = null;
+    let hasPlannedCurrentShift = false;
+
+    // Board & Juggler state
+    let jugglers = [];
+    let innerSlots = [];
+    let outerSlots = [];
+    let arcSlots = [];
+    let activeTransitions = [];
+    let lastRenderedPositions = [];
+
+    // Pairwise interaction tracking
+    let pairMatrix = [];
+    let currentBeatPairs = [];
+    let lastBeatPairedStations = []; // Station indices that passed on Beat 1 (for Beat 2 trail)
+    let uniquePairsCount = 0;
+    let totalPossiblePairs = 378;
+    let allToAllCompletedCycle = null;
+
+    // Selected juggler for path/partner highlighting
+    let selectedJugglerId = null;
+
+    function stationAngle(i, m) {
+      return -Math.PI / 2 + (i * 2 * Math.PI) / m;
+    }
+
+    function arcMidAngle(i, m) {
+      return -Math.PI / 2 + ((i + 0.5) * 2 * Math.PI) / m;
+    }
+
+    function lerpAngleCCW(a0, a1, t) {
+      let diff = a1 - a0;
+      while (diff > 0) diff -= 2 * Math.PI;
+      while (diff <= -2 * Math.PI) diff += 2 * Math.PI;
+      return a0 + diff * t;
+    }
+
+    function lerpAngleShortest(a0, a1, t) {
+      let diff = a1 - a0;
+      while (diff > Math.PI) diff -= 2 * Math.PI;
+      while (diff < -Math.PI) diff += 2 * Math.PI;
+      return a0 + diff * t;
+    }
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    /**
+     * Initialize simulation for M stations and N jugglers (N in [24, 42])
+     */
+    function initSimulation(m, n) {
+      const minRequiredM = Math.max(12, Math.ceil((n + 2) / 2));
+      numStations = Math.max(m, minRequiredM);
+      stationSlider.value = `${numStations}`;
+
+      const maxAllowedN = Math.min(42, 2 * numStations - 1);
+      numJugglers = Math.max(24, Math.min(maxAllowedN, n));
+
+      jugglerSlider.min = '24';
+      jugglerSlider.max = `${maxAllowedN}`;
+      jugglerSlider.value = `${numJugglers}`;
+
+      totalPossiblePairs = (numJugglers * (numJugglers - 1)) / 2;
+
+      stationCountLabel.textContent = `${numStations}`;
+      jugglerCountLabel.textContent = `${numJugglers}`;
+      entryProbLabel.textContent = `${Math.round(entryProbability * 100)}%`;
+      headerTitleStats.textContent = `M = ${numStations}, N = ${numJugglers}`;
+      metricJugglerFormulaEl.textContent = `N = ${numJugglers} jugglers`;
+      ruleMinPassesText.textContent = `${minPasses} ${minPasses === 1 ? 'pass' : 'passes'}`;
+      ruleEntryProbText.textContent = `${Math.round(entryProbability * 100)}%`;
+
+      cycleIndex = 0;
+      cyclePhase = 0.0;
+      hasPlannedCurrentShift = false;
+      pauseAfterOneCycle = false;
+      totalBacktracks = 0;
+      activeTransitions = [];
+      lastRenderedPositions = [];
+
+      pairMatrix = Array.from({ length: numJugglers }, () => new Uint16Array(numJugglers));
+      currentBeatPairs = [];
+      lastBeatPairedStations = [];
+      uniquePairsCount = 0;
+      allToAllCompletedCycle = null;
+
+      if (selectedJugglerId && selectedJugglerId > numJugglers) {
+        selectedJugglerId = null;
+      }
+
+      innerSlots = new Array(numStations).fill(null);
+      outerSlots = new Array(numStations).fill(null);
+      arcSlots = new Array(numStations).fill(null);
+      jugglers = [];
+
+      // Seed ~22% of N as perimeter movers (e.g., for M=19, N=28: 11 complete pairs = 22 stationed + 6 movers)
+      // so 11 radial passes fire immediately on Beat 1 of Cycle 0!
+      const targetMovers = Math.max(4, Math.round(numJugglers * 0.22));
+      const initialPairs = Math.max(
+        1,
+        Math.min(Math.floor((numJugglers - targetMovers) / 2), numStations - 2)
+      );
+      const pairedStations = [];
+      for (let p = 0; p < initialPairs; p++) {
+        pairedStations.push(Math.floor((p * numStations) / initialPairs));
+      }
+
+      let nextId = 1;
+      for (const st of pairedStations) {
+        const inId = nextId++;
+        const outId = nextId++;
+        innerSlots[st] = inId;
+        outerSlots[st] = outId;
+        jugglers.push({
+          id: inId,
+          role: 'inner',
+          index: st,
+          stintPasses: (st % minPasses),
+          targetRing: 'outer',
+          soloWait: 0,
+          lapCount: 0
+        });
+        jugglers.push({
+          id: outId,
+          role: 'outer',
+          index: st,
+          stintPasses: ((st + 1) % minPasses),
+          targetRing: 'inner',
+          soloWait: 0,
+          lapCount: 0
+        });
+      }
+
+      // Place remaining jugglers on perimeter arcs seeking alternating rings
+      const remaining = numJugglers - (nextId - 1);
+      for (let r = 0; r < remaining; r++) {
+        let arcIdx = Math.floor((r * numStations) / Math.max(1, remaining)) % numStations;
+        while (arcSlots[arcIdx] !== null) {
+          arcIdx = (arcIdx + 1) % numStations;
+        }
+        const mId = nextId++;
+        arcSlots[arcIdx] = mId;
+        jugglers.push({
+          id: mId,
+          role: 'mover',
+          index: arcIdx,
+          stintPasses: 0,
+          targetRing: r % 2 === 0 ? 'inner' : 'outer',
+          soloWait: 0,
+          lapCount: 0
+        });
+      }
+
+      recordPassingBeat();
+      updateTelemetryUI();
+      renderMatrix();
+    }
+
+    /**
+     * Beat 1: Record radial passes on every paired segment and increment stint counters
+     */
+    function recordPassingBeat() {
+      currentBeatPairs = [];
+      lastBeatPairedStations = [];
+      for (let i = 0; i < numStations; i++) {
+        const a = innerSlots[i];
+        const b = outerSlots[i];
+        if (a !== null && b !== null) {
+          currentBeatPairs.push([a, b]);
+          lastBeatPairedStations.push(i);
+          const idxA = a - 1;
+          const idxB = b - 1;
+          if (pairMatrix[idxA][idxB] === 0) {
+            uniquePairsCount++;
+          }
+          pairMatrix[idxA][idxB] += 1;
+          pairMatrix[idxB][idxA] += 1;
+
+          const jA = jugglers[idxA];
+          const jB = jugglers[idxB];
+          jA.stintPasses += 1;
+          jB.stintPasses += 1;
+          jA.soloWait = 0;
+          jB.soloWait = 0;
+        } else if (a !== null) {
+          jugglers[a - 1].soloWait += 1;
+        } else if (b !== null) {
+          jugglers[b - 1].soloWait += 1;
+        }
+      }
+
+      if (uniquePairsCount === totalPossiblePairs && allToAllCompletedCycle === null) {
+        allToAllCompletedCycle = cycleIndex;
+      }
+    }
+
+    /**
+     * Beats 2–6: Strictly counterclockwise movement with minimum pass quota
+     * and memoryless stochastic entry into target rings.
+     */
+    function planMusicalChairsStep() {
+      const M = numStations;
+      const nextInner = [...innerSlots];
+      const nextOuter = [...outerSlots];
+      const nextArc = [...arcSlots];
+      const transitions = [];
+      const movedIds = new Set();
+
+      // 1. Stationed jugglers who completed >= minPasses exit strictly CCW onto arc (i - 1 + M) % M
+      const parityFlip = cycleIndex % 2 === 0;
+      for (let step = 0; step < M; step++) {
+        const i = (step + cycleIndex) % M;
+        const exitArc = (i - 1 + M) % M;
+        const candidates = parityFlip ? ['inner', 'outer'] : ['outer', 'inner'];
+
+        for (const ring of candidates) {
+          const id = ring === 'inner' ? nextInner[i] : nextOuter[i];
+          if (id === null || movedIds.has(id)) continue;
+          const jObj = jugglers[id - 1];
+
+          if (jObj.stintPasses >= minPasses && nextArc[exitArc] === null) {
+            if (ring === 'inner') nextInner[i] = null;
+            else nextOuter[i] = null;
+
+            nextArc[exitArc] = id;
+            jObj.role = 'mover';
+            jObj.index = exitArc;
+            jObj.stintPasses = 0;
+            jObj.soloWait = 0;
+            jObj.targetRing = ring === 'inner' ? 'outer' : 'inner';
+            movedIds.add(id);
+
+            transitions.push({
+              id,
+              fromRole: ring,
+              fromIndex: i,
+              toRole: 'mover',
+              toIndex: exitArc
+            });
+            break; // At most one exit into exitArc per cycle
+          }
+        }
+      }
+
+      // 2. Perimeter movers at arc `a` look strictly CCW at station `a` (entry) or arc `(a - 1 + M) % M` (cruise)
+      for (let step = 0; step < M; step++) {
+        const a = (step + cycleIndex * 3) % M;
+        const id = arcSlots[a];
+        if (id === null || movedIds.has(id)) continue;
+
+        const jObj = jugglers[id - 1];
+        const target = jObj.targetRing;
+        const isTargetOpen = target === 'inner' ? nextInner[a] === null : nextOuter[a] === null;
+        const nextA = (a - 1 + M) % M;
+
+        // Memoryless stochastic entry into open target slot at station `a`
+        if (isTargetOpen && Math.random() < entryProbability) {
+          nextArc[a] = null;
+          if (target === 'inner') nextInner[a] = id;
+          else nextOuter[a] = id;
+
+          jObj.role = target;
+          jObj.index = a;
+          jObj.stintPasses = 0;
+          jObj.soloWait = 0;
+          movedIds.add(id);
+
+          transitions.push({
+            id,
+            fromRole: 'mover',
+            fromIndex: a,
+            toRole: target,
+            toIndex: a
+          });
+        } else if (nextArc[nextA] === null) {
+          // Cruise strictly CCW along the perimeter lane
+          nextArc[a] = null;
+          nextArc[nextA] = id;
+          jObj.role = 'mover';
+          jObj.index = nextA;
+          movedIds.add(id);
+
+          transitions.push({
+            id,
+            fromRole: 'mover',
+            fromIndex: a,
+            toRole: 'mover',
+            toIndex: nextA
+          });
+        }
+      }
+
+      // 3. All remaining jugglers hold their current positions
+      for (const jObj of jugglers) {
+        if (!movedIds.has(jObj.id)) {
+          transitions.push({
+            id: jObj.id,
+            fromRole: jObj.role,
+            fromIndex: jObj.index,
+            toRole: jObj.role,
+            toIndex: jObj.index
+          });
+        }
+      }
+
+      innerSlots = nextInner;
+      outerSlots = nextOuter;
+      arcSlots = nextArc;
+      activeTransitions = transitions;
+    }
+
+    /**
+     * Update Sidebar Telemetry, Progress Bar, and Selected Juggler Info
+     */
+    function updateTelemetryUI() {
+      const currentBeat = Math.floor(cyclePhase) + 1;
+      cycleCounterEl.textContent = `Cycle ${cycleIndex}`;
+
+      let activePairs = 0;
+      let stationedCount = 0;
+      for (let i = 0; i < numStations; i++) {
+        if (innerSlots[i] !== null) stationedCount++;
+        if (outerSlots[i] !== null) stationedCount++;
+        if (innerSlots[i] !== null && outerSlots[i] !== null) activePairs++;
+      }
+      const moverCount = numJugglers - stationedCount;
+      roleBreakdownBadge.textContent = `${stationedCount} Stationed (${activePairs} Pairs) • ${moverCount} Movers`;
+      ccwVerifyBadge.textContent = `${totalBacktracks} Backtracks (100% CCW)`;
+
+      if (currentBeat === 1) {
+        beatBadge.textContent = `BEAT 1: PASS (${activePairs} Active Pairs)`;
+        beatBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300';
+      } else {
+        beatBadge.textContent = `BEATS 2–6 (Beat ${currentBeat}): CCW SHIFT`;
+        beatBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
+      }
+
+      beatPills.forEach((pill) => {
+        const b = parseInt(pill.dataset.beat, 10);
+        if (b === currentBeat) {
+          pill.className = b === 1
+            ? 'w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold bg-amber-500 text-white shadow-sm scale-105 transition'
+            : 'w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold bg-emerald-600 text-white shadow-sm scale-105 transition';
+        } else {
+          pill.className = 'w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold bg-slate-200 text-slate-600 transition';
+        }
+      });
+
+      const pct = (uniquePairsCount / totalPossiblePairs) * 100;
+      coveragePercentEl.textContent = `${pct.toFixed(1)}%`;
+      if (overlayMatrixPct) overlayMatrixPct.textContent = `${pct.toFixed(1)}%`;
+      metricPairsCountEl.textContent = `${uniquePairsCount} / ${totalPossiblePairs}`;
+      coverageBarEl.style.width = `${Math.min(100, pct)}%`;
+
+      if (allToAllCompletedCycle !== null) {
+        completionBannerEl.className = 'text-xs rounded-xl px-3 py-2 bg-emerald-50 border border-emerald-300 text-emerald-900 font-medium';
+        completionBannerEl.innerHTML = `<strong>100% All-to-All Achieved!</strong> Every juggler passed with all ${numJugglers - 1} others by <strong>Cycle ${allToAllCompletedCycle}</strong> (${allToAllCompletedCycle * 6} beats).`;
+      } else {
+        completionBannerEl.className = 'text-xs rounded-xl px-3 py-2 bg-slate-50 border border-slate-200 text-slate-600';
+        completionBannerEl.innerHTML = `In progress: slide <strong class="text-slate-800">Speed to 20x</strong> to watch 100% mixing complete.`;
+      }
+
+      if (selectedJugglerId !== null && pairMatrix[selectedJugglerId - 1]) {
+        const row = pairMatrix[selectedJugglerId - 1];
+        let partnersMet = 0;
+        let totalPasses = 0;
+        for (let j = 0; j < numJugglers; j++) {
+          if (j !== selectedJugglerId - 1 && row[j] > 0) {
+            partnersMet++;
+            totalPasses += row[j];
+          }
+        }
+        selectedTitleEl.textContent = `Tracking Juggler #${selectedJugglerId} — Met ${partnersMet} / ${numJugglers - 1} partners (${totalPasses} passes)`;
+        selectedSubtitleEl.textContent = `Gold dot = Juggler #${selectedJugglerId} • Emerald ring = partners already passed with.`;
+        clearSelectionBtn.classList.remove('hidden');
+      } else {
+        selectedTitleEl.textContent = `Click any juggler dot (#1–#${numJugglers}) to track`;
+        selectedSubtitleEl.textContent = `Highlighted juggler turns gold; past partners get a green ring.`;
+        clearSelectionBtn.classList.add('hidden');
+      }
+    }
+
+    /**
+     * Render the N x N Pairwise Adjacency Matrix onto any target canvas
+     */
+    function drawMatrixOnCanvas(targetCanvas, targetCtx) {
+      if (!targetCanvas || !targetCtx) return;
+      const N = numJugglers;
+      const size = targetCanvas.width;
+      targetCtx.clearRect(0, 0, size, size);
+
+      const pad = 3;
+      const gridSize = size - pad * 2;
+      const cell = gridSize / N;
+
+      const activeSet = new Set();
+      if (cyclePhase < 1.0) {
+        for (const [a, b] of currentBeatPairs) {
+          activeSet.add(`${a - 1},${b - 1}`);
+          activeSet.add(`${b - 1},${a - 1}`);
+        }
+      }
+
+      for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
+          const x = pad + c * cell;
+          const y = pad + r * cell;
+
+          if (r === c) {
+            targetCtx.fillStyle = '#94a3b8';
+          } else if (activeSet.has(`${r},${c}`)) {
+            targetCtx.fillStyle = '#f59e0b';
+          } else if (pairMatrix[r] && pairMatrix[r][c] > 0) {
+            if (selectedJugglerId !== null && (r === selectedJugglerId - 1 || c === selectedJugglerId - 1)) {
+              targetCtx.fillStyle = '#10b981';
+            } else {
+              targetCtx.fillStyle = '#4f46e5';
+            }
+          } else {
+            if (selectedJugglerId !== null && (r === selectedJugglerId - 1 || c === selectedJugglerId - 1)) {
+              targetCtx.fillStyle = '#fef3c7';
+            } else {
+              targetCtx.fillStyle = '#e2e8f0';
+            }
+          }
+
+          targetCtx.fillRect(x + 0.25, y + 0.25, Math.max(1, cell - 0.5), Math.max(1, cell - 0.5));
+        }
+      }
+    }
+
+    function renderMatrix() {
+      drawMatrixOnCanvas(matrixCanvas, mCtx);
+      drawMatrixOnCanvas(overlayMatrixCanvas, omCtx);
+    }
+
+    /**
+     * Polar -> Cartesian slot coordinates
+     */
+    function getSlotCoords(role, index, cx, cy, R, halfSeg) {
+      if (role === 'inner') {
+        const theta = stationAngle(index, numStations);
+        const r = R - halfSeg;
+        return {
+          x: cx + r * Math.cos(theta),
+          y: cy + r * Math.sin(theta),
+          theta,
+          r,
+          facing: theta // Outward toward perimeter
+        };
+      } else if (role === 'outer') {
+        const theta = stationAngle(index, numStations);
+        const r = R + halfSeg;
+        return {
+          x: cx + r * Math.cos(theta),
+          y: cy + r * Math.sin(theta),
+          theta,
+          r,
+          facing: theta + Math.PI // Inward toward center
+        };
+      } else {
+        const theta = arcMidAngle(index, numStations);
+        const r = R;
+        return {
+          x: cx + r * Math.cos(theta),
+          y: cy + r * Math.sin(theta),
+          theta,
+          r,
+          facing: theta - Math.PI / 2 // Counterclockwise tangent
+        };
+      }
+    }
+
+    /**
+     * Draw a numbered juggler dot with directional facing cone & optional target-ring badge
+     */
+    function drawJuggler(id, x, y, facingAngle, baseColor, radius, badgeText) {
+      const isSelected = selectedJugglerId === id;
+      const isMetPartner =
+        selectedJugglerId !== null &&
+        !isSelected &&
+        pairMatrix[selectedJugglerId - 1] &&
+        pairMatrix[selectedJugglerId - 1][id - 1] > 0;
+
+      const fillColor = isSelected ? '#f59e0b' : baseColor;
+
+      ctx.save();
+      ctx.translate(x, y);
+
+      if (isSelected) {
+        ctx.beginPath();
+        ctx.arc(0, 0, radius + 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.28)';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#d97706';
+        ctx.stroke();
+      } else if (isMetPartner) {
+        ctx.beginPath();
+        ctx.arc(0, 0, radius + 3, 0, Math.PI * 2);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#10b981';
+        ctx.stroke();
+      }
+
+      // Drop shadow
+      ctx.beginPath();
+      ctx.arc(0, 1.5, radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.16)';
+      ctx.fill();
+
+      // Directional facing cone
+      ctx.save();
+      ctx.rotate(facingAngle);
+      ctx.beginPath();
+      ctx.moveTo(radius + 5.5, 0);
+      ctx.lineTo(radius - 1.5, -4.5);
+      ctx.lineTo(radius - 1.5, 4.5);
+      ctx.closePath();
+      ctx.fillStyle = fillColor;
+      ctx.fill();
+      ctx.restore();
+
+      // Main body
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI * 2);
+      ctx.fillStyle = fillColor;
+      ctx.fill();
+      ctx.lineWidth = 1.6;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
+      // Juggler ID
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `700 ${id >= 10 ? 8.5 : 9.5}px Inter, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`${id}`, 0, 0.5);
+
+      // Next-ring badge ('I' or 'O') for perimeter movers
+      if (badgeText) {
+        ctx.beginPath();
+        ctx.arc(radius * 0.85, -radius * 0.85, 5.2, 0, Math.PI * 2);
+        ctx.fillStyle = badgeText === 'I' ? '#4f46e5' : '#0d9488';
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 6.5px Inter, sans-serif';
+        ctx.fillText(badgeText, radius * 0.85, -radius * 0.85 + 0.3);
+      }
+
+      ctx.restore();
+      lastRenderedPositions.push({ id, x, y, radius });
+    }
+
+    /**
+     * Draw a glowing radial pass beam between Inner and Outer endpoints on Beat 1
+     */
+    function drawPassBeam(pIn, pOut, intensity) {
+      if (intensity <= 0) return;
+      ctx.save();
+
+      // Soft outer amber aura
+      ctx.beginPath();
+      ctx.moveTo(pIn.x, pIn.y);
+      ctx.lineTo(pOut.x, pOut.y);
+      ctx.strokeStyle = `rgba(245, 158, 11, ${0.28 * intensity})`;
+      ctx.lineWidth = 14;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // Crisp inner gold-orange passing core
+      ctx.beginPath();
+      ctx.moveTo(pIn.x, pIn.y);
+      ctx.lineTo(pOut.x, pOut.y);
+      ctx.strokeStyle = `rgba(217, 119, 6, ${0.75 * intensity})`;
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    /**
+     * Draw an in-flight juggling prop on Beat 1
+     */
+    function drawProp(x, y, angle) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 8.5, 4.6, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.42)';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 5.5, 2.8, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fill();
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    /**
+     * Render the 2D top-down schematic onto HTML5 Canvas
+     */
+    function render() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = container.getBoundingClientRect();
+      const targetW = Math.max(320, rect.width || 760);
+      const targetH = Math.max(540, rect.height || 580);
+      if (canvas.width !== Math.round(targetW * dpr) || canvas.height !== Math.round(targetH * dpr)) {
+        canvas.width = Math.round(targetW * dpr);
+        canvas.height = Math.round(targetH * dpr);
+      }
+
+      lastRenderedPositions = [];
+
+      try {
+        ctx.save();
+        ctx.scale(dpr, dpr);
+
+        const W = targetW;
+        const H = targetH;
+        ctx.clearRect(0, 0, W, H);
+        const cx = W / 2;
+        const cy = H / 2 - 8;
+
+        // True-to-scale geometry: 6 ft arc spacing -> R_ft = (M * 6) / (2 * PI), half-segment = 3.5 ft
+        const rFt = (numStations * 6.0) / (2 * Math.PI);
+        const halfSegFt = 3.5;
+        const maxDrawableRadius = Math.min(W, H - 36) * 0.42;
+        const pxPerFt = maxDrawableRadius / (rFt + halfSegFt + 2.0);
+
+        const R = rFt * pxPerFt;
+        const halfSeg = halfSegFt * pxPerFt;
+        const innerR = R - halfSeg;
+        const outerR = R + halfSeg;
+
+        // 1. Concentric dashed guide rings
+        ctx.save();
+        ctx.setLineDash([4, 5]);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(100, 116, 139, 0.32)';
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // 2. Central Perimeter Circle (CCW Walking / Shunting Lane)
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(30, 58, 138, 0.16)';
+        ctx.lineWidth = 10;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.strokeStyle = '#1e3a8a';
+        ctx.lineWidth = 1.8;
+        ctx.setLineDash([7, 5]);
+        ctx.stroke();
+        ctx.restore();
+
+        // Counterclockwise lane chevrons
+        for (let q = 0; q < 4; q++) {
+          const a = (q * Math.PI) / 2 + Math.PI / 4;
+          ctx.save();
+          ctx.translate(cx + R * Math.cos(a), cy + R * Math.sin(a));
+          ctx.rotate(a - Math.PI / 2);
+          ctx.beginPath();
+          ctx.moveTo(6, 0);
+          ctx.lineTo(-3, -4);
+          ctx.lineTo(-3, 4);
+          ctx.closePath();
+          ctx.fillStyle = 'rgba(30, 58, 138, 0.42)';
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // Center crosshair & scale annotation
+        ctx.save();
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(cx - 9, cy);
+        ctx.lineTo(cx + 9, cy);
+        ctx.moveTo(cx, cy - 9);
+        ctx.lineTo(cx, cy + 9);
+        ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '500 11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`M = ${numStations} segments • N = ${numJugglers} jugglers`, cx, cy + 21);
+        ctx.fillText(`Min ${minPasses} passes/slot • Strictly CCW`, cx, cy + 35);
+        ctx.restore();
+
+        const isPassingBeat = cyclePhase < 1.0;
+
+        // 3. Draw 7-ft Radial Segments centered on Red Perimeter Marks & Endpoint Sockets
+        for (let i = 0; i < numStations; i++) {
+          const theta = stationAngle(i, numStations);
+          const cosT = Math.cos(theta);
+          const sinT = Math.sin(theta);
+
+          const xIn = cx + innerR * cosT;
+          const yIn = cy + innerR * sinT;
+          const xOut = cx + outerR * cosT;
+          const yOut = cy + outerR * sinT;
+          const xMark = cx + R * cosT;
+          const yMark = cy + R * sinT;
+
+          const isPairedStation = isPassingBeat && innerSlots[i] !== null && outerSlots[i] !== null;
+
+          // Radial 7-ft line segment
+          ctx.beginPath();
+          ctx.moveTo(xIn, yIn);
+          ctx.lineTo(xOut, yOut);
+          ctx.strokeStyle = isPairedStation ? '#f59e0b' : '#475569';
+          ctx.lineWidth = isPairedStation ? 3.2 : 2.0;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+
+          // Red perimeter mark at exact center of the 7-ft segment
+          ctx.beginPath();
+          ctx.arc(xMark, yMark, 3.2, 0, Math.PI * 2);
+          ctx.fillStyle = '#dc2626';
+          ctx.fill();
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = '#ffffff';
+          ctx.stroke();
+
+          // Inner & Outer dashed endpoint sockets
+          const socketR = Math.max(8, Math.min(10.5, R * 0.056));
+          for (const [sx, sy] of [[xIn, yIn], [xOut, yOut]]) {
+            ctx.beginPath();
+            ctx.arc(sx, sy, socketR, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+            ctx.fill();
+            ctx.save();
+            ctx.setLineDash([2.5, 2.5]);
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // Station label outside outer endpoint
+          const labelR = outerR + 19;
+          ctx.fillStyle = '#64748b';
+          ctx.font = '600 10px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(`${i + 1}`, cx + labelR * cosT, cy + labelR * sinT);
+        }
+
+        // 4. Draw Jugglers & In-Flight Passes
+        const jugglerRadius = Math.max(7.5, Math.min(10.5, R * 0.058));
+
+        if (isPassingBeat) {
+          // Draw glowing passing beams first so juggler dots sit crisply on top
+          const beamPulse = 0.72 + 0.28 * Math.sin(cyclePhase * Math.PI);
+          for (let i = 0; i < numStations; i++) {
+            if (innerSlots[i] !== null && outerSlots[i] !== null) {
+              const pIn = getSlotCoords('inner', i, cx, cy, R, halfSeg);
+              const pOut = getSlotCoords('outer', i, cx, cy, R, halfSeg);
+              drawPassBeam(pIn, pOut, beamPulse);
+            }
+          }
+
+          for (let i = 0; i < numStations; i++) {
+            if (innerSlots[i] !== null) {
+              const pos = getSlotCoords('inner', i, cx, cy, R, halfSeg);
+              drawJuggler(innerSlots[i], pos.x, pos.y, pos.facing, '#4f46e5', jugglerRadius, null);
+            }
+            if (outerSlots[i] !== null) {
+              const pos = getSlotCoords('outer', i, cx, cy, R, halfSeg);
+              drawJuggler(outerSlots[i], pos.x, pos.y, pos.facing, '#0d9488', jugglerRadius, null);
+            }
+            if (arcSlots[i] !== null) {
+              const mId = arcSlots[i];
+              const jObj = jugglers[mId - 1];
+              const pos = getSlotCoords('mover', i, cx, cy, R, halfSeg);
+              const tag = jObj && jObj.targetRing === 'inner' ? 'I' : 'O';
+              drawJuggler(mId, pos.x, pos.y, pos.facing, '#10b981', jugglerRadius, tag);
+            }
+          }
+
+          // Animate radial passes flying both ways across all paired segments
+          const passT = cyclePhase;
+          for (let i = 0; i < numStations; i++) {
+            if (innerSlots[i] !== null && outerSlots[i] !== null) {
+              const pIn = getSlotCoords('inner', i, cx, cy, R, halfSeg);
+              const pOut = getSlotCoords('outer', i, cx, cy, R, halfSeg);
+              const theta = stationAngle(i, numStations);
+              const perpX = -Math.sin(theta) * 4.5;
+              const perpY = Math.cos(theta) * 4.5;
+
+              drawProp(
+                pIn.x + (pOut.x - pIn.x) * passT + perpX,
+                pIn.y + (pOut.y - pIn.y) * passT + perpY,
+                theta + passT * Math.PI * 2
+              );
+              drawProp(
+                pOut.x + (pIn.x - pOut.x) * passT - perpX,
+                pOut.y + (pIn.y - pOut.y) * passT - perpY,
+                theta - passT * Math.PI * 2
+              );
+            }
+          }
+        } else {
+          // Subtle passing afterglow during Beat 2 (cyclePhase 1.0 -> 2.0) so passes remain easy to spot at high speed
+          if (cyclePhase < 2.0) {
+            const trailFade = 0.45 * (1.0 - (cyclePhase - 1.0));
+            for (const stIdx of lastBeatPairedStations) {
+              const pIn = getSlotCoords('inner', stIdx, cx, cy, R, halfSeg);
+              const pOut = getSlotCoords('outer', stIdx, cx, cy, R, halfSeg);
+              drawPassBeam(pIn, pOut, trailFade);
+            }
+          }
+
+          // Beats 2–6: Smoothly interpolate all jugglers along strictly CCW paths
+          const moveT = easeInOutCubic((cyclePhase - 1.0) / 5.0);
+
+          for (const tr of activeTransitions) {
+            const start = getSlotCoords(tr.fromRole, tr.fromIndex, cx, cy, R, halfSeg);
+            const end = getSlotCoords(tr.toRole, tr.toIndex, cx, cy, R, halfSeg);
+
+            const isStationary = tr.fromRole === tr.toRole && tr.fromIndex === tr.toIndex;
+            const curR = start.r + (end.r - start.r) * moveT;
+            const curTheta = isStationary ? start.theta : lerpAngleCCW(start.theta, end.theta, moveT);
+            const x = cx + curR * Math.cos(curTheta);
+            const y = cy + curR * Math.sin(curTheta);
+            const curFacing = lerpAngleShortest(start.facing, end.facing, moveT);
+
+            let color = '#10b981';
+            let tag = null;
+            if (tr.toRole === 'inner') {
+              color = '#4f46e5';
+            } else if (tr.toRole === 'outer') {
+              color = '#0d9488';
+            } else {
+              const jObj = jugglers[tr.id - 1];
+              tag = jObj && jObj.targetRing === 'inner' ? 'I' : 'O';
+            }
+
+            drawJuggler(tr.id, x, y, curFacing, color, jugglerRadius, tag);
+          }
+        }
+
+        ctx.restore();
+      } catch (err) {
+        console.error('Canvas render error:', err);
+      }
+    }
+
+    /**
+     * Advance simulation clock cleanly (supports high fast-forward speeds up to 20x)
+     */
+    function stepSimulationClock(deltaBeats) {
+      let remaining = deltaBeats;
+      let matrixDirty = false;
+
+      while (remaining > 0) {
+        if (cyclePhase < 1.0) {
+          const toShift = 1.0 - cyclePhase;
+          if (remaining >= toShift) {
+            cyclePhase = 1.0;
+            remaining -= toShift;
+            if (!hasPlannedCurrentShift) {
+              planMusicalChairsStep();
+              hasPlannedCurrentShift = true;
+            }
+          } else {
+            cyclePhase += remaining;
+            remaining = 0;
+          }
+        } else {
+          const toNextCycle = 6.0 - cyclePhase;
+          if (remaining >= toNextCycle) {
+            cyclePhase = 0.0;
+            remaining -= toNextCycle;
+            cycleIndex += 1;
+            hasPlannedCurrentShift = false;
+            recordPassingBeat();
+            matrixDirty = true;
+          } else {
+            cyclePhase += remaining;
+            remaining = 0;
+          }
+        }
+      }
+
+      updateTelemetryUI();
+      if (matrixDirty) {
+        renderMatrix();
+      }
+    }
+
+    function updatePlayButtonUI() {
+      playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
+      playPauseBtn.className = isPlaying
+        ? 'px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold transition shadow-sm cursor-pointer'
+        : 'px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold transition shadow-sm cursor-pointer';
+    }
+
+    function updateQuotaButtonsUI() {
+      const buttons = [
+        [1, quota1Btn],
+        [2, quota2Btn],
+        [3, quota3Btn]
+      ];
+      for (const [val, btn] of buttons) {
+        if (minPasses === val) {
+          btn.className = 'px-2 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs transition cursor-pointer';
+        } else {
+          btn.className = 'px-2 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-200/70 transition cursor-pointer';
+        }
+      }
+    }
+
+    function animate(timestamp) {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const dt = Math.min(0.1, (timestamp - lastTimestamp) / 1000);
+      lastTimestamp = timestamp;
+
+      if (isPlaying) {
+        // Dwell longer on Beat 1 (the passing beat: ~1.2s at 1.0x speed) so radial passes are unmistakable
+        const beatsPerSec = cyclePhase < 1.0 ? 0.85 : 2.6;
+        stepSimulationClock(dt * beatsPerSec * speedMultiplier);
+      }
+
+      render();
+      requestAnimationFrame(animate);
+    }
+
+    // Interactive Controls
+    playPauseBtn.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      updatePlayButtonUI();
+    });
+
+    stepBtn.addEventListener('click', () => {
+      const beatsToNextCycle = 6.0 - cyclePhase;
+      stepSimulationClock(beatsToNextCycle);
+      isPlaying = false;
+      updatePlayButtonUI();
+      render();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      initSimulation(numStations, numJugglers);
+      render();
+    });
+
+    quota1Btn.addEventListener('click', () => {
+      minPasses = 1;
+      updateQuotaButtonsUI();
+      initSimulation(numStations, numJugglers);
+      render();
+    });
+
+    quota2Btn.addEventListener('click', () => {
+      minPasses = 2;
+      updateQuotaButtonsUI();
+      initSimulation(numStations, numJugglers);
+      render();
+    });
+
+    quota3Btn.addEventListener('click', () => {
+      minPasses = 3;
+      updateQuotaButtonsUI();
+      initSimulation(numStations, numJugglers);
+      render();
+    });
+
+    stationSlider.addEventListener('input', (e) => {
+      const m = parseInt(e.target.value, 10);
+      initSimulation(m, numJugglers);
+      render();
+    });
+
+    jugglerSlider.addEventListener('input', (e) => {
+      const n = parseInt(e.target.value, 10);
+      initSimulation(numStations, n);
+      render();
+    });
+
+    entryProbSlider.addEventListener('input', (e) => {
+      const pct = parseInt(e.target.value, 10);
+      entryProbability = pct / 100;
+      entryProbLabel.textContent = `${pct}%`;
+      ruleEntryProbText.textContent = `${pct}%`;
+    });
+
+    speedSlider.addEventListener('input', (e) => {
+      speedMultiplier = parseFloat(e.target.value);
+      speedLabel.textContent = `${speedMultiplier.toFixed(1)}x`;
+    });
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      let closest = null;
+      let bestDist = 22;
+      for (const item of lastRenderedPositions) {
+        const d = Math.hypot(item.x - clickX, item.y - clickY);
+        if (d < bestDist) {
+          bestDist = d;
+          closest = item.id;
+        }
+      }
+
+      if (closest !== null) {
+        selectedJugglerId = selectedJugglerId === closest ? null : closest;
+        updateTelemetryUI();
+        renderMatrix();
+        render();
+      }
+    });
+
+    clearSelectionBtn.addEventListener('click', () => {
+      selectedJugglerId = null;
+      updateTelemetryUI();
+      renderMatrix();
+      render();
+    });
+
+    function bindMatrixInteractions(targetCanvas) {
+      if (!targetCanvas) return;
+      targetCanvas.addEventListener('mousemove', (e) => {
+        const rect = targetCanvas.getBoundingClientRect();
+        const pad = 3;
+        const gridSize = rect.width - pad * 2;
+        const c = Math.floor(((e.clientX - rect.left - pad) / gridSize) * numJugglers);
+        const r = Math.floor(((e.clientY - rect.top - pad) / gridSize) * numJugglers);
+        if (r >= 0 && r < numJugglers && c >= 0 && c < numJugglers && overlayMatrixHover) {
+          if (r === c) {
+            overlayMatrixHover.textContent = `Juggler #${r + 1}`;
+          } else {
+            const count = pairMatrix[r] ? pairMatrix[r][c] : 0;
+            overlayMatrixHover.textContent = `#${r + 1} ↔ #${c + 1}: ${count} ${count === 1 ? 'pass' : 'passes'}`;
+          }
+        }
+      });
+
+      targetCanvas.addEventListener('mouseleave', () => {
+        if (overlayMatrixHover) overlayMatrixHover.textContent = 'Click cell to inspect pair';
+      });
+
+      targetCanvas.addEventListener('click', (e) => {
+        const rect = targetCanvas.getBoundingClientRect();
+        const pad = 3;
+        const gridSize = rect.width - pad * 2;
+        const r = Math.floor(((e.clientY - rect.top - pad) / gridSize) * numJugglers);
+        if (r >= 0 && r < numJugglers) {
+          const clickedId = r + 1;
+          selectedJugglerId = selectedJugglerId === clickedId ? null : clickedId;
+          updateTelemetryUI();
+          renderMatrix();
+          render();
+        }
+      });
+    }
+
+    bindMatrixInteractions(overlayMatrixCanvas);
+    bindMatrixInteractions(matrixCanvas);
+
+    let isInitialized = false;
+    function startApp() {
+      if (isInitialized) return;
+      isInitialized = true;
+      initSimulation(19, 28);
+      updatePlayButtonUI();
+      updateQuotaButtonsUI();
+      render();
+      requestAnimationFrame(animate);
+    }
+
+    if (typeof ResizeObserver !== 'undefined') {
+      const resizeObserver = new ResizeObserver(() => {
+        if (isInitialized) render();
+      });
+      resizeObserver.observe(container);
+    }
+
+    window.addEventListener('resize', () => {
+      if (isInitialized) render();
+    });
+
+    document.addEventListener('DOMContentLoaded', startApp);
+    window.addEventListener('load', startApp);
+    startApp();
+  </script>
+</body>
+</html>
