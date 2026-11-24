@@ -279,3 +279,5 @@ Nov 23, 26; I get gemini to draft a musical chairs pattern
 		https://share.gemini.google/Zy1hlSL8SlPl
 
 		https://share.gemini.google/jP4kiDwcdOuc
+	... on the current draft musical chairs...should add the rule that movers in the circle have the right
+		of way...also, might be nice to avoid the stochastic rule for time being
