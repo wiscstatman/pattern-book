@@ -28,10 +28,10 @@
     <div class="max-w-7xl mx-auto flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
       <div>
         <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
-          Strictly CCW All-to-All Juggling Pattern (<span id="headerTitleStats">M = 19, N = 28</span>)
+          Deterministic Right-of-Way Juggling Pattern (<span id="headerTitleStats">M = 19, N = 28</span>)
         </h1>
         <p class="text-xs sm:text-sm text-slate-500">
-          Zero backtracking (strictly CCW) • Min passes before exit • Lane-flipping movers mix all N jugglers
+          Movers have right-of-way • Deterministic step-in when open • Passers exit only after min passes + clear CCW lane
         </p>
       </div>
 
@@ -47,6 +47,9 @@
           </button>
           <button id="resetBtn" type="button" class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs sm:text-sm font-medium transition cursor-pointer">
             Reset
+          </button>
+          <button id="allToAllPresetBtn" type="button" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold transition shadow-xs cursor-pointer" title="Load Prime-M N = 2M - 1 configuration guaranteed to reach 100% all-to-all coverage">
+            100% Preset (M=17, N=33)
           </button>
         </div>
 
@@ -78,14 +81,6 @@
             Jugglers (N): <span id="jugglerCountLabel" class="text-indigo-700 font-bold">28</span>
           </label>
           <input id="jugglerSlider" type="range" min="24" max="42" value="28" step="1" class="w-16 sm:w-20 accent-indigo-600 cursor-pointer" />
-        </div>
-
-        <!-- Stochastic Entry Probability (20% to 100%, default 65%) -->
-        <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200">
-          <label for="entryProbSlider" class="text-xs font-semibold text-slate-600 whitespace-nowrap">
-            Step-In Prob: <span id="entryProbLabel" class="text-emerald-700 font-bold">65%</span>
-          </label>
-          <input id="entryProbSlider" type="range" min="20" max="100" value="65" step="5" class="w-16 sm:w-20 accent-emerald-600 cursor-pointer" />
         </div>
 
         <!-- Speed Control (0.5x up to 20x fast-forward) -->
@@ -219,11 +214,11 @@
 
       <!-- Schematic Legend & Rule Card -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex-1">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Memoryless Stochastic Rules</h2>
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Deterministic Right-of-Way Rules</h2>
         <div id="ruleDescription" class="text-xs text-slate-600 leading-relaxed space-y-1.5">
-          <p>• <strong>Beat 1 (Pass):</strong> Paired segments exchange radial passes and increment each occupant's <span class="font-mono text-[11px] bg-slate-100 px-1 rounded">passesInSlot</span>. Solo occupants hold their spot until paired.</p>
-          <p>• <strong>Forward-Only Exit (Beats 2–6):</strong> After completing <strong id="ruleMinPassesText" class="text-slate-800">2 passes</strong>, a juggler steps strictly <strong>CCW</strong> onto arc <span class="font-mono text-[11px] bg-slate-100 px-1 rounded">(i − 1) mod M</span> (never backward) and switches target ring (<span class="font-mono text-[11px]">I ↔ O</span>).</p>
-          <p>• <strong>Memoryless Stochastic Entry:</strong> No partner memory needed—when a mover reaches an open slot in their target ring, they step in with probability <strong id="ruleEntryProbText" class="text-emerald-700">65%</strong>, or keep cruising <strong>CCW</strong> otherwise.</p>
+          <p>• <strong>1. Obligatory Mover Entry (Right of Way):</strong> When a mover approaches station <span class="font-mono text-[11px] bg-slate-100 px-1 rounded">a</span>, if <em>either</em> spot is open they <strong>must</strong> enter it. If <em>both</em> are open, they take the side opposite their last stint (starting movers: <strong>odd → Inner</strong>, <strong>even → Outer</strong>); if only one is open, they must take it.</p>
+          <p>• <strong>2. Passers Yield &amp; Continue Passing:</strong> Stationed jugglers keep passing on Beat 1 until they have completed <strong id="ruleMinPassesText" class="text-slate-800">2+ passes</strong> <em>and</em> the CCW perimeter arc ahead is clear (no mover occupying or advancing into it).</p>
+          <p>• <strong>3. Advance Only When Blocked:</strong> A mover only continues CCW along the circle when both Inner and Outer at station <span class="font-mono text-[11px] bg-slate-100 px-1 rounded">a</span> are occupied.</p>
         </div>
       </div>
 
@@ -259,12 +254,11 @@
     const playPauseBtn = document.getElementById('playPauseBtn');
     const stepBtn = document.getElementById('stepBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const allToAllPresetBtn = document.getElementById('allToAllPresetBtn');
     const stationSlider = document.getElementById('stationSlider');
     const stationCountLabel = document.getElementById('stationCountLabel');
     const jugglerSlider = document.getElementById('jugglerSlider');
     const jugglerCountLabel = document.getElementById('jugglerCountLabel');
-    const entryProbSlider = document.getElementById('entryProbSlider');
-    const entryProbLabel = document.getElementById('entryProbLabel');
     const quota1Btn = document.getElementById('quota1Btn');
     const quota2Btn = document.getElementById('quota2Btn');
     const quota3Btn = document.getElementById('quota3Btn');
@@ -276,7 +270,6 @@
     const roleBreakdownBadge = document.getElementById('roleBreakdownBadge');
     const ccwVerifyBadge = document.getElementById('ccwVerifyBadge');
     const ruleMinPassesText = document.getElementById('ruleMinPassesText');
-    const ruleEntryProbText = document.getElementById('ruleEntryProbText');
     const beatPills = document.querySelectorAll('#beatPills span');
 
     // Coverage & Inspector Readouts
@@ -290,10 +283,9 @@
     const clearSelectionBtn = document.getElementById('clearSelectionBtn');
 
     // Simulation Parameters & State
-    let numStations = 19;    // Default M = 19 (prime, fits 24-42 jugglers cleanly)
-    let numJugglers = 28;    // Default N = 28 (range 24 to 42)
+    let numStations = 17;    // Prime M = 17 with N = 33 (2M - 1) guarantees 100% all-to-all coverage
+    let numJugglers = 33;    // Default N = 33 (range 24 to 42)
     let minPasses = 2;       // Minimal passes required in a position before moving (default 2)
-    let entryProbability = 0.65; // Memoryless probability of stepping into an eligible target slot
     let isPlaying = true;
     let speedMultiplier = 1.5;
     let pauseAfterOneCycle = false;
@@ -312,6 +304,7 @@
     let innerSlots = [];
     let outerSlots = [];
     let arcSlots = [];
+    let stationNextExit = []; // Alternates 'inner' / 'outer' per station so neither partner gets pinned
     let activeTransitions = [];
     let lastRenderedPositions = [];
 
@@ -371,11 +364,9 @@
 
       stationCountLabel.textContent = `${numStations}`;
       jugglerCountLabel.textContent = `${numJugglers}`;
-      entryProbLabel.textContent = `${Math.round(entryProbability * 100)}%`;
       headerTitleStats.textContent = `M = ${numStations}, N = ${numJugglers}`;
       metricJugglerFormulaEl.textContent = `N = ${numJugglers} jugglers`;
-      ruleMinPassesText.textContent = `${minPasses} ${minPasses === 1 ? 'pass' : 'passes'}`;
-      ruleEntryProbText.textContent = `${Math.round(entryProbability * 100)}%`;
+      ruleMinPassesText.textContent = `${minPasses}+ ${minPasses === 1 ? 'pass' : 'passes'}`;
 
       cycleIndex = 0;
       cyclePhase = 0.0;
@@ -398,22 +389,37 @@
       innerSlots = new Array(numStations).fill(null);
       outerSlots = new Array(numStations).fill(null);
       arcSlots = new Array(numStations).fill(null);
+      stationNextExit = Array.from({ length: numStations }, (_, idx) => (idx % 2 === 0 ? 'inner' : 'outer'));
       jugglers = [];
 
-      // Seed ~22% of N as perimeter movers (e.g., for M=19, N=28: 11 complete pairs = 22 stationed + 6 movers)
-      // so 11 radial passes fire immediately on Beat 1 of Cycle 0!
-      const targetMovers = Math.max(4, Math.round(numJugglers * 0.22));
-      const initialPairs = Math.max(
-        1,
-        Math.min(Math.floor((numJugglers - targetMovers) / 2), numStations - 2)
-      );
+      // Seed stationary pairs & perimeter movers:
+      // For N = 2M - 1 (e.g. M = 17, N = 33), we want ONLY ONE open passing slot on the entire ring
+      // (M - 2 full pairs + 2 solo jugglers + 1 perimeter mover = 2(M-2) + 2 + 1 = 2M - 1),
+      // so there is never a 2-hole split that fragments the orbit!
+      const totalPassingSlots = 2 * numStations;
+      const desiredMovers = numJugglers >= totalPassingSlots - 1
+        ? 1
+        : Math.max(2, Math.min(numStations - 2, Math.round((totalPassingSlots - numJugglers) * 0.45)));
+      const stationedTarget = numJugglers - desiredMovers;
+      const initialPairs = numJugglers === totalPassingSlots - 1
+        ? numStations - 2
+        : Math.max(1, Math.min(Math.floor(stationedTarget / 2), numStations - 1));
+      const extraSolos = Math.max(0, stationedTarget - 2 * initialPairs);
+
+      // Leave stations 0 and 1 for the 2 solo jugglers when N = 2M - 1, pairing stations 2..M-1
       const pairedStations = [];
-      for (let p = 0; p < initialPairs; p++) {
-        pairedStations.push(Math.floor((p * numStations) / initialPairs));
+      if (numJugglers === totalPassingSlots - 1) {
+        for (let st = 2; st < numStations; st++) {
+          pairedStations.push(st);
+        }
+      } else {
+        for (let p = 0; p < initialPairs; p++) {
+          pairedStations.push(Math.floor((p * numStations) / initialPairs));
+        }
       }
 
       let nextId = 1;
-      for (const st of pairedStations) {
+      pairedStations.forEach((st, idx) => {
         const inId = nextId++;
         const outId = nextId++;
         innerSlots[st] = inId;
@@ -422,7 +428,7 @@
           id: inId,
           role: 'inner',
           index: st,
-          stintPasses: (st % minPasses),
+          stintPasses: idx % minPasses,
           targetRing: 'outer',
           soloWait: 0,
           lapCount: 0
@@ -431,17 +437,46 @@
           id: outId,
           role: 'outer',
           index: st,
-          stintPasses: ((st + 1) % minPasses),
+          stintPasses: (idx + 1) % minPasses,
           targetRing: 'inner',
           soloWait: 0,
           lapCount: 0
         });
+      });
+
+      // Place extra solo stationed jugglers in unoccupied stations (leaving exactly 1 open passing slot for N = 2M - 1)
+      let placedSolos = 0;
+      for (let st = 0; st < numStations && placedSolos < extraSolos; st++) {
+        if (innerSlots[st] === null && outerSlots[st] === null) {
+          const sId = nextId++;
+          const ring = placedSolos % 2 === 0 ? 'inner' : 'outer';
+          if (ring === 'inner') innerSlots[st] = sId;
+          else outerSlots[st] = sId;
+          jugglers.push({
+            id: sId,
+            role: ring,
+            index: st,
+            stintPasses: 0,
+            targetRing: ring === 'inner' ? 'outer' : 'inner',
+            soloWait: 0,
+            lapCount: 0
+          });
+          placedSolos++;
+        }
       }
 
-      // Place remaining jugglers on perimeter arcs seeking alternating rings
+      // Place remaining jugglers on perimeter arcs (starting on arc 0 just clockwise of Station 0's open slot)
       const remaining = numJugglers - (nextId - 1);
+      const openStations = [];
+      for (let st = 0; st < numStations; st++) {
+        if (innerSlots[st] === null || outerSlots[st] === null) {
+          openStations.push(st);
+        }
+      }
       for (let r = 0; r < remaining; r++) {
-        let arcIdx = Math.floor((r * numStations) / Math.max(1, remaining)) % numStations;
+        let arcIdx = openStations.length > 0
+          ? openStations[r % openStations.length]
+          : Math.floor((r * numStations) / Math.max(1, remaining)) % numStations;
         while (arcSlots[arcIdx] !== null) {
           arcIdx = (arcIdx + 1) % numStations;
         }
@@ -452,7 +487,7 @@
           role: 'mover',
           index: arcIdx,
           stintPasses: 0,
-          targetRing: r % 2 === 0 ? 'inner' : 'outer',
+          targetRing: mId % 2 === 1 ? 'inner' : 'outer',
           soloWait: 0,
           lapCount: 0
         });
@@ -464,17 +499,30 @@
     }
 
     /**
-     * Beat 1: Record radial passes on every paired segment and increment stint counters
+     * Beat 1: Record all radial passes between paired Inner & Outer jugglers
      */
     function recordPassingBeat() {
       currentBeatPairs = [];
       lastBeatPairedStations = [];
+
       for (let i = 0; i < numStations; i++) {
         const a = innerSlots[i];
         const b = outerSlots[i];
         if (a !== null && b !== null) {
           currentBeatPairs.push([a, b]);
           lastBeatPairedStations.push(i);
+
+          const jA = jugglers[a - 1];
+          const jB = jugglers[b - 1];
+          if (jA) {
+            jA.stintPasses += 1;
+            jA.soloWait = 0;
+          }
+          if (jB) {
+            jB.stintPasses += 1;
+            jB.soloWait = 0;
+          }
+
           const idxA = a - 1;
           const idxB = b - 1;
           if (pairMatrix[idxA][idxB] === 0) {
@@ -482,17 +530,12 @@
           }
           pairMatrix[idxA][idxB] += 1;
           pairMatrix[idxB][idxA] += 1;
-
-          const jA = jugglers[idxA];
-          const jB = jugglers[idxB];
-          jA.stintPasses += 1;
-          jB.stintPasses += 1;
-          jA.soloWait = 0;
-          jB.soloWait = 0;
         } else if (a !== null) {
-          jugglers[a - 1].soloWait += 1;
+          const jA = jugglers[a - 1];
+          if (jA) jA.soloWait += 1;
         } else if (b !== null) {
-          jugglers[b - 1].soloWait += 1;
+          const jB = jugglers[b - 1];
+          if (jB) jB.soloWait += 1;
         }
       }
 
@@ -502,71 +545,55 @@
     }
 
     /**
-     * Beats 2–6: Strictly counterclockwise movement with minimum pass quota
-     * and memoryless stochastic entry into target rings.
+     * Beats 2–6: Deterministic Right-of-Way Movement (Strictly CCW)
+     * ------------------------------------------------------------
+     * 1. Perimeter movers have strict right of way:
+     *    - Approaching station `a` from arc `a`, if their target ring slot (`inner` or `outer`)
+     *      is currently open, they deterministically step in.
+     *    - Otherwise, they advance counterclockwise along the perimeter to arc `(a - 1 + M) % M`
+     *      (unless blocked by another mover ahead).
+     * 2. Stationed passers yield to perimeter traffic:
+     *    - A passer at station `i` only exits onto perimeter arc `exitArc = (i - 1 + M) % M` if:
+     *        (a) they have completed at least `minPasses` radial passes in their spot, AND
+     *        (b) `exitArc` is completely free after all perimeter movers have claimed their moves
+     *            (no mover stayed on `exitArc` and no mover advanced into `exitArc`).
+     *    - Otherwise, the passer stays put and keeps passing on the next Beat 1!
      */
     function planMusicalChairsStep() {
       const M = numStations;
       const nextInner = [...innerSlots];
       const nextOuter = [...outerSlots];
-      const nextArc = [...arcSlots];
+      const nextArc = new Array(M).fill(null);
       const transitions = [];
       const movedIds = new Set();
 
-      // 1. Stationed jugglers who completed >= minPasses exit strictly CCW onto arc (i - 1 + M) % M
-      const parityFlip = cycleIndex % 2 === 0;
-      for (let step = 0; step < M; step++) {
-        const i = (step + cycleIndex) % M;
-        const exitArc = (i - 1 + M) % M;
-        const candidates = parityFlip ? ['inner', 'outer'] : ['outer', 'inner'];
-
-        for (const ring of candidates) {
-          const id = ring === 'inner' ? nextInner[i] : nextOuter[i];
-          if (id === null || movedIds.has(id)) continue;
-          const jObj = jugglers[id - 1];
-
-          if (jObj.stintPasses >= minPasses && nextArc[exitArc] === null) {
-            if (ring === 'inner') nextInner[i] = null;
-            else nextOuter[i] = null;
-
-            nextArc[exitArc] = id;
-            jObj.role = 'mover';
-            jObj.index = exitArc;
-            jObj.stintPasses = 0;
-            jObj.soloWait = 0;
-            jObj.targetRing = ring === 'inner' ? 'outer' : 'inner';
-            movedIds.add(id);
-
-            transitions.push({
-              id,
-              fromRole: ring,
-              fromIndex: i,
-              toRole: 'mover',
-              toIndex: exitArc
-            });
-            break; // At most one exit into exitArc per cycle
-          }
-        }
-      }
-
-      // 2. Perimeter movers at arc `a` look strictly CCW at station `a` (entry) or arc `(a - 1 + M) % M` (cruise)
-      for (let step = 0; step < M; step++) {
-        const a = (step + cycleIndex * 3) % M;
+      // Phase A: Perimeter movers act first (Right of Way)
+      // Step 1: Any mover approaching station `a` MUST enter if either Inner or Outer is open.
+      // If both are open, pick `targetRing` (opposite last stint, or odd->inner / even->outer initially).
+      // If only one spot is open, take that spot regardless of side.
+      const cruisingMovers = [];
+      for (let a = 0; a < M; a++) {
         const id = arcSlots[a];
-        if (id === null || movedIds.has(id)) continue;
+        if (id === null) continue;
 
         const jObj = jugglers[id - 1];
-        const target = jObj.targetRing;
-        const isTargetOpen = target === 'inner' ? nextInner[a] === null : nextOuter[a] === null;
-        const nextA = (a - 1 + M) % M;
+        const innerOpen = nextInner[a] === null;
+        const outerOpen = nextOuter[a] === null;
 
-        // Memoryless stochastic entry into open target slot at station `a`
-        if (isTargetOpen && Math.random() < entryProbability) {
-          nextArc[a] = null;
-          if (target === 'inner') nextInner[a] = id;
+        let chosenRing = null;
+        if (innerOpen && outerOpen) {
+          chosenRing = jObj.targetRing;
+        } else if (innerOpen) {
+          chosenRing = 'inner';
+        } else if (outerOpen) {
+          chosenRing = 'outer';
+        }
+
+        if (chosenRing !== null) {
+          if (chosenRing === 'inner') nextInner[a] = id;
           else nextOuter[a] = id;
 
-          jObj.role = target;
+          jObj.role = chosenRing;
           jObj.index = a;
           jObj.stintPasses = 0;
           jObj.soloWait = 0;
@@ -576,12 +603,35 @@
             id,
             fromRole: 'mover',
             fromIndex: a,
-            toRole: target,
+            toRole: chosenRing,
             toIndex: a
           });
-        } else if (nextArc[nextA] === null) {
-          // Cruise strictly CCW along the perimeter lane
-          nextArc[a] = null;
+        } else {
+          cruisingMovers.push({ id, a });
+        }
+      }
+
+      // Step 2: Remaining movers cruise counterclockwise along the perimeter lane
+      // Resolve trains cleanly so a mover advances if the arc ahead is open or vacated by a mover ahead
+      const cruiseSet = new Set(cruisingMovers.map((m) => m.a));
+      const advancingArcs = new Set();
+      let changed = true;
+      while (changed) {
+        changed = false;
+        for (const { a } of cruisingMovers) {
+          if (advancingArcs.has(a)) continue;
+          const nextA = (a - 1 + M) % M;
+          if (!cruiseSet.has(nextA) || advancingArcs.has(nextA)) {
+            advancingArcs.add(a);
+            changed = true;
+          }
+        }
+      }
+
+      for (const { id, a } of cruisingMovers) {
+        const jObj = jugglers[id - 1];
+        if (advancingArcs.has(a)) {
+          const nextA = (a - 1 + M) % M;
           nextArc[nextA] = id;
           jObj.role = 'mover';
           jObj.index = nextA;
@@ -594,10 +644,53 @@
             toRole: 'mover',
             toIndex: nextA
           });
+        } else {
+          // Blocked by a stationary mover directly ahead; holds arc `a`
+          nextArc[a] = id;
         }
       }
 
-      // 3. All remaining jugglers hold their current positions
+      // Phase B: Stationed jugglers who completed >= minPasses exit ONLY if they have right of way
+      // (i.e., the perimeter arc `exitArc = (i - 1 + M) % M` is completely unoccupied in `nextArc`).
+      // Each station alternates `stationNextExit[i]` between 'inner' and 'outer' so neither partner is pinned!
+      for (let step = 0; step < M; step++) {
+        const i = (step + cycleIndex) % M;
+        const exitArc = (i - 1 + M) % M;
+        if (nextArc[exitArc] !== null) continue; // Perimeter mover has right of way
+
+        const preferred = stationNextExit[i];
+        const candidates = preferred === 'inner' ? ['inner', 'outer'] : ['outer', 'inner'];
+        for (const ring of candidates) {
+          const id = ring === 'inner' ? nextInner[i] : nextOuter[i];
+          if (id === null || movedIds.has(id)) continue;
+
+          const jObj = jugglers[id - 1];
+          if (jObj.stintPasses >= minPasses) {
+            if (ring === 'inner') nextInner[i] = null;
+            else nextOuter[i] = null;
+
+            nextArc[exitArc] = id;
+            jObj.role = 'mover';
+            jObj.index = exitArc;
+            jObj.stintPasses = 0;
+            jObj.soloWait = 0;
+            jObj.targetRing = ring === 'inner' ? 'outer' : 'inner';
+            stationNextExit[i] = ring === 'inner' ? 'outer' : 'inner';
+            movedIds.add(id);
+
+            transitions.push({
+              id,
+              fromRole: ring,
+              fromIndex: i,
+              toRole: 'mover',
+              toIndex: exitArc
+            });
+            break; // Only one passer can enter `exitArc` per cycle
+          }
+        }
+      }
+
+      // Phase C: All remaining jugglers hold their current positions (passers continue passing!)
       for (const jObj of jugglers) {
         if (!movedIds.has(jObj.id)) {
           transitions.push({
@@ -660,11 +753,12 @@
       coverageBarEl.style.width = `${Math.min(100, pct)}%`;
 
       if (allToAllCompletedCycle !== null) {
+        const passingBeatsCount = allToAllCompletedCycle + 1;
         completionBannerEl.className = 'text-xs rounded-xl px-3 py-2 bg-emerald-50 border border-emerald-300 text-emerald-900 font-medium';
-        completionBannerEl.innerHTML = `<strong>100% All-to-All Achieved!</strong> Every juggler passed with all ${numJugglers - 1} others by <strong>Cycle ${allToAllCompletedCycle}</strong> (${allToAllCompletedCycle * 6} beats).`;
+        completionBannerEl.innerHTML = `<strong>100% All-to-All Achieved!</strong> Every juggler passed with all ${numJugglers - 1} others after <strong>${passingBeatsCount} passing beats</strong> (Cycle ${allToAllCompletedCycle}).`;
       } else {
         completionBannerEl.className = 'text-xs rounded-xl px-3 py-2 bg-slate-50 border border-slate-200 text-slate-600';
-        completionBannerEl.innerHTML = `In progress: slide <strong class="text-slate-800">Speed to 20x</strong> to watch 100% mixing complete.`;
+        completionBannerEl.innerHTML = `In progress: slide <strong class="text-slate-800">Speed to 20x</strong> to watch 100% all-to-all mixing complete.`;
       }
 
       if (selectedJugglerId !== null && pairMatrix[selectedJugglerId - 1]) {
@@ -1274,6 +1368,13 @@
       render();
     });
 
+    allToAllPresetBtn.addEventListener('click', () => {
+      minPasses = 2;
+      updateQuotaButtonsUI();
+      initSimulation(17, 33);
+      render();
+    });
+
     quota1Btn.addEventListener('click', () => {
       minPasses = 1;
       updateQuotaButtonsUI();
@@ -1305,13 +1406,6 @@
       const n = parseInt(e.target.value, 10);
       initSimulation(numStations, n);
       render();
-    });
-
-    entryProbSlider.addEventListener('input', (e) => {
-      const pct = parseInt(e.target.value, 10);
-      entryProbability = pct / 100;
-      entryProbLabel.textContent = `${pct}%`;
-      ruleEntryProbText.textContent = `${pct}%`;
     });
 
     speedSlider.addEventListener('input', (e) => {
@@ -1393,7 +1487,7 @@
     function startApp() {
       if (isInitialized) return;
       isInitialized = true;
-      initSimulation(19, 28);
+      initSimulation(17, 33);
       updatePlayButtonUI();
       updateQuotaButtonsUI();
       render();
